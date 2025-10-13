@@ -8,6 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { DriverContext } from "../../contexts/DriverContext.js";
 import { useContext } from "react";
 import SvgHome from '../../assets/images/svgHome.svg';
+import SvgLogo from '../../assets/images/svgLogo.svg';
 
 export default function Login(){
     const [email,setEmail] = useState('');
@@ -84,6 +85,7 @@ export default function Login(){
         keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
         style={styles.container}>
             <StatusBar barStyle={'light-content'} backgroundColor={'#FFFFFF'} />
+            <SvgLogo width={185} height={40} />
             <SvgHome width={356} height={328} />
             <Text style={styles.texto}>Acessar minha conta</Text>
             <TextInputComponent
