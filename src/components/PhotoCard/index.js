@@ -1,6 +1,6 @@
 import { StyleSheet, View, Image } from "react-native";
 import { useContext } from "react";
-import { DriverContext } from "../contexts/DriverContext";
+import { DriverContext } from "../../contexts/DriverContext";
 
 
 export default function PhotoCard(){

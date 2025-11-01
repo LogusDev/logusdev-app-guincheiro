@@ -68,7 +68,7 @@ export default function Login(){
             successAlert();
             console.log('login feito')
             setTimeout(()=>{
-                navigation.navigate('MainHome');
+                navigation.navigate('Home');
             },1500)
         } catch (error){
             console.log(error)
