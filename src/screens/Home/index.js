@@ -10,6 +10,7 @@ import { Image } from 'expo-image';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { Video } from 'expo-av';
 import SearchingVideo from '../../assets/images/searching.gif';
+import { getCallsWaiting } from '../../services/calls';
 
 export default function Home({navigation}){
 
@@ -40,36 +41,58 @@ export default function Home({navigation}){
 
     const startTime = useRef(null);
 
+    const pollingIntervalRef = useRef(null);
+
+    const fetchCalls = async () => {
+        try {
+            const { latitude, longitude } = location;
+
+            const data = await getCallsWaiting(latitude, longitude);
+
+            if (Array.isArray(data)) {
+                setChamados(data);
+            } else if (data && Array.isArray(data.calls)) {
+                setChamados(data.calls);
+            } else {
+                setChamados([]);
+            }
+        } catch (error) {
+            console.error("Erro ao buscar chamados:", error);
+            setChamados([]);
+        }
+    };
+
+
+    console.log(location?.latitude, location?.longitude);
+
     const handleStatus = async () => {
         if (!isOnline) {
             setIsOnline(true);
-            // Simula busca de chamados disponíveis
-            // Substitua por chamada real à API se necessário
-            const chamadosMock = [
-                 {
-                     id: 1,
-                     nome: 'José Guilherme Ferreira',
-                     carro: 'Fiat Palio EX 1998',
-                     tempo: 'Há 1h30',
-                     distancia: '282km',
-                     foto: ""
-                 },
-                 {
-                     id: 2,
-                     nome: 'Nickolas Maximiano',
-                     carro: 'Chevrolet Cobalt 2015',
-                     tempo: 'Há 1 hora',
-                     distancia: '26km',
-                     foto: ""
-                 },
-
-            ];
-            setChamados(chamadosMock);
         } else {
             setIsOnline(false);
             setChamados([]);
         }
     }
+
+    useEffect(() => {
+        if (isOnline) {
+            fetchCalls();
+            pollingIntervalRef.current = setInterval(fetchCalls, 8000);
+            console.log('Iniciando polling de chamados...');
+        } else {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+                pollingIntervalRef.current = null;
+            }
+        }
+
+        return () => {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+                pollingIntervalRef.current = null;
+            }
+        };
+    }, [isOnline]);
 
     useEffect(() => {
         startTime.current = Date.now();
@@ -119,7 +142,7 @@ export default function Home({navigation}){
 
     return(
         <View style={styles.container}>
-            <StatusBar backgroundColor={'#FFFFFF'} barStyle={"dark-content"} />
+            <StatusBar backgroundColor={'#FFFFFF'} barStyle={"dark-content"}  />
             {permissionDenied ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
                     <Text style={{ textAlign: 'center' }}>
@@ -176,29 +199,30 @@ export default function Home({navigation}){
                             {chamados.length > 0 ? (
                                 chamados.map((c) => (
                                     <TouchableOpacity
-                                     key={c.id} style={styles.card}
-                                     onPress={()=> navigation.navigate('DetalheChamado', { chamado: c }) }
-                                     >
+                                        key={c.id}
+                                        style={styles.card}
+                                        onPress={() => navigation.navigate('DetalheChamado', { chamado: c })}
+                                    >
                                         <Image
-                                            source={c.foto ? { uri: c.foto } : require('../../assets/images/profileIcon.png')}
+                                            source={c.cliente_foto_url ? { uri: c.cliente_foto_url } : require('../../assets/images/profileIcon.png')}
                                             style={styles.avatar}
                                         />
                                         <View style={styles.info}>
-                                            <Text style={styles.nome}>{c.nome}</Text>
-                                            <Text style={styles.carro}>{c.carro}</Text>
-                                            <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 2}}>
-                                                <View style={[styles.statusDot, { backgroundColor: c.statusColor || '#FF9800' }]} />
-                                                <Text style={styles.tempo}>{c.tempo}</Text>
+                                            <Text style={styles.nome}>{c.cliente_nome}</Text>
+                                            <Text style={styles.carro}>{c.veiculo_info}</Text>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+                                                <View style={[styles.statusDot, { backgroundColor: '#FF9800' }]} />
+                                                <Text style={styles.tempo}>{c.tempo_espera_formatado}</Text>
                                             </View>
                                         </View>
                                         <View style={styles.distanciaBox}>
-                                            <Text style={styles.distanciaText}>{c.distancia}</Text>
+                                            <Text style={styles.distanciaText}>{c.distancia_km} km</Text>
                                         </View>
                                     </TouchableOpacity>
                                 ))
                             ) : (
                                 <View style={styles.buscaContainer}>
-                                    <Image          
+                                    <Image
                                         source={require('../../assets/images/searching.gif')}
                                         style={{ width: 200, height: 200, marginBottom: 12 }}
                                         contentFit="contain"

@@ -21,7 +21,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.maathj.logusdevappguincheiro"
+      "package": "com.maathj.logusdevappguincheiro",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBkx6mo29bFuoPzoNSLpE97c8EoWptHl1M"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

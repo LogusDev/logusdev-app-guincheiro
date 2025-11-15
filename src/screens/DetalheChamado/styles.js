@@ -1,111 +1,139 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
+export default StyleSheet.create({
+  card: {
+    width: "100%",
+    backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    paddingHorizontal: 24,
-    paddingTop: 32,
+    paddingHorizontal: 26,
+    paddingTop: 24,
+    paddingBottom: 34,
+    elevation: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: -4 },
   },
+
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#1F284E',
+    fontWeight: "700",
+    color: "#000",
     marginBottom: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
-  clienteRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 18,
+
+  profileRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 22,
   },
   avatar: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     marginRight: 12,
-    borderWidth: 2,
-    borderColor: '#1F284E',
   },
   nome: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1F284E',
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1F284E",
   },
-  infoBox: {
-    backgroundColor: '#F7F7F7',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 18,
+
+  // Endereços
+  addressBox: {
+    marginBottom: 20,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
+  addressRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
   },
-  localTitle: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#1F284E',
+  addressTitle: {
+    fontSize: 16,
+    color: "#1F284E",
+    fontWeight: "bold",
+  },
+  addressText: {
+    fontSize: 14,
+    color: "#6C6C6C",
+    marginTop: 2,
+  },
+
+  dottedLineContainer: {
+    height: 28,
+    width: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: -4,
     marginLeft: 8,
-    marginRight: 4,
   },
-  localDesc: {
-    fontSize: 13,
-    color: '#6C6C6C',
-    marginLeft: 4,
-    flex: 1,
+  dottedLine: {
+    height: "100%",
+    width: 1,
+    borderLeftWidth: 2,
+    borderStyle: "dotted",
+    borderColor: "#C0C0C0",
   },
+
+  divider: {
+    height: 1,
+    backgroundColor: "#E0E0E0",
+    marginVertical: 14,
+  },
+
+  // Carro
   carRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 18,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 14,
+    marginTop: 12,
+  },
+  carImage: {
+    width: 55,
+    height: 28,
+    marginRight: 10,
   },
   carInfo: {
-    fontSize: 15,
-    color: '#1F284E',
-    marginLeft: 8,
-    fontWeight: '500',
-  },
-  valorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    marginBottom: 18,
-  },
-  valorLabel: {
     fontSize: 16,
-    color: '#1F284E',
-    fontWeight: 'bold',
-    marginRight: 8,
+    color: "#1F284E",
   },
-  valor: {
-    color: '#20B26A',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  pagamento: {
-    fontSize: 15,
-    color: '#1F284E',
-    marginLeft: 8,
-    fontWeight: '500',
-  },
-  confirmarBtn: {
-    backgroundColor: '#1F284E',
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
+
+  // Valor e pagamento
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 12,
-    marginBottom: 24,
   },
-  confirmarText: {
-    color: '#fff',
-    fontSize: 17,
-    fontWeight: 'bold',
+  priceLabel: {
+    fontSize: 18,
+    color: "#1F284E",
+    fontWeight: "700",
+  },
+  priceValue: {
+    fontSize: 18,
+    color: "#20B26A",
+    fontWeight: "700",
+  },
+  payment: {
+    fontSize: 16,
+    color: "#1F284E",
+    fontWeight: "600",
+    marginLeft: 8,
+  },
+
+  // Botão Confirmar
+  confirmButton: {
+    backgroundColor: "#1F284E",
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginTop: 22,
+  },
+  confirmText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "700",
     letterSpacing: 1,
   },
 });
-
-export default styles;

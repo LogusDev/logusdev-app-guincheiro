@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     },
     photoCard: {
         position: 'absolute',
-        top: 32,
+        top: 40,
         right: 16,
         zIndex: 2,
         alignItems: 'center',
@@ -54,7 +54,7 @@ export const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontWeight: 'bold',
-        fontSize: 18,
+        fontSize: 17,
     },
     clientesContainer: {
         flex: 1,
