@@ -23,7 +23,7 @@ export default function DetalheChamado({ route }) {
 
   const mapRef = useRef(null);
 
-  // BUSCA DETALHES
+  // BUSCA OS DETALHES DO CHAMADO
   useEffect(() => {
     const fetchDetails = async () => {
       try {
@@ -38,7 +38,7 @@ export default function DetalheChamado({ route }) {
     fetchDetails();
   }, [chamado.id]);
 
-  // LOCALIZAÇÃO
+  // LOCALIZAÇÃO DO GUINCHEIRO
   useEffect(() => {
     let watcher = null;
 
@@ -67,7 +67,7 @@ export default function DetalheChamado({ route }) {
     return () => watcher && watcher.remove();
   }, []);
 
-  // AJUSTA O MAPA
+  // AJUSTE DO MAPA (corrigido)
   useEffect(() => {
     if (mapRef.current && detalhe && posicaoGuincheiro) {
       const origem = {
@@ -79,10 +79,13 @@ export default function DetalheChamado({ route }) {
         longitude: Number(detalhe.coordenadas_destino.longitude),
       };
 
-      mapRef.current.fitToCoordinates([posicaoGuincheiro, origem, destino], {
-        edgePadding: { top: 120, right: 80, bottom: 420, left: 80 },
-        animated: true,
-      });
+      mapRef.current.fitToCoordinates(
+        [posicaoGuincheiro, origem, destino],
+        {
+          edgePadding: { top: 120, right: 80, bottom: 180, left: 80 }, // AJUSTADO AQUI
+          animated: true,
+        }
+      );
     }
   }, [posicaoGuincheiro, detalhe]);
 
@@ -159,19 +162,21 @@ export default function DetalheChamado({ route }) {
         />
       </MapView>
 
-      {/* CARD FIXO NA PARTE DE BAIXO */}
+      {/* CARD INFERIOR */}
       <View
         style={{
           position: "absolute",
           bottom: 0,
           left: 0,
           right: 0,
-          paddingHorizontal: 20,
-          paddingTop: 20,
-          paddingBottom: 30,
           backgroundColor: "#fff",
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 8,
         }}
       >
         <View style={styles.card}>
@@ -190,29 +195,37 @@ export default function DetalheChamado({ route }) {
           </View>
 
           <View style={styles.addressBox}>
-            <View className={styles.addressRow}>
-              <IconOrigem width={20} height={20} />
-              <View style={{ flex: 1, marginLeft: 8 }}>
+            <View style={styles.addressRow}>
+              <View style={styles.iconContainer}>
+                <IconOrigem width={22} height={22} />
+              </View>
+              <View style={styles.addressContent}>
                 <Text style={styles.addressTitle}>
                   {detalhe.endereco_inicio?.split(",")[0]}
                 </Text>
-                <Text style={styles.addressText}>
+                <Text style={styles.addressText} numberOfLines={1} ellipsizeMode="tail">
                   {detalhe.endereco_inicio}
                 </Text>
               </View>
             </View>
 
             <View style={styles.dottedLineContainer}>
-              <View style={styles.dottedLine} />
+              <View style={styles.dottedLine}>
+                <View style={styles.dottedDot} />
+                <View style={styles.dottedDot} />
+                <View style={styles.dottedDot} />
+              </View>
             </View>
 
             <View style={styles.addressRow}>
-              <Ionicons name="location" size={20} color="#FFB100" />
-              <View style={{ flex: 1, marginLeft: 8 }}>
+              <View style={styles.iconContainer}>
+                <Ionicons name="location" size={22} color="#FFB100" />
+              </View>
+              <View style={styles.addressContent}>
                 <Text style={styles.addressTitle}>
                   {detalhe.endereco_destino?.split(",")[0]}
                 </Text>
-                <Text style={styles.addressText}>
+                <Text style={styles.addressText} numberOfLines={1} ellipsizeMode="tail">
                   {detalhe.endereco_destino}
                 </Text>
               </View>
@@ -220,19 +233,23 @@ export default function DetalheChamado({ route }) {
           </View>
 
           <View style={styles.carRow}>
-            <Hatch width={24} height={24} style={{ marginRight: 8 }} />
-            <Text style={styles.carInfo}>
-              <Text style={{ fontWeight: "bold" }}>
+            <View style={styles.carIconContainer}>
+              <Hatch width={60} height={60} />
+            </View>
+            <View style={styles.carInfoContainer}>
+              <Text style={styles.carModel}>
                 {detalhe.carro?.modelo}
-              </Text>{" "}
-              {detalhe.carro?.ano} / ***{detalhe.carro?.placa?.slice(-4)}
-            </Text>
+              </Text>
+              <Text style={styles.carDetails}>
+                {detalhe.carro?.marca || "Renault"} {detalhe.carro?.ano} / ***{detalhe.carro?.placa?.slice(-4)}
+              </Text>
+            </View>
           </View>
 
           <View style={styles.priceRow}>
             <Text style={styles.priceLabel}>Valor:</Text>
             <Text style={styles.priceValue}>
-              R$ {Number(detalhe.preco).toFixed(2).replace(".", ",")}
+              R$:{Number(detalhe.preco).toFixed(2).replace(".", ",")}
             </Text>
 
             <View style={{ flex: 1 }} />

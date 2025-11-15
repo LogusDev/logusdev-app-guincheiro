@@ -17,10 +17,8 @@ export default function App(){
   
   return(
     <>
-      <PaperProvider>
       <StackNavigator/>
       <Toast/>
-      </PaperProvider>
     </>
   )
 }
