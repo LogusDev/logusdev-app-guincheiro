@@ -11,6 +11,7 @@ import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { Video } from 'expo-av';
 import SearchingVideo from '../../assets/images/searching.gif';
 import { getCallsWaiting } from '../../services/calls';
+import { lightMapStyle } from '../../utils/mapStyle';
 
 export default function Home({navigation}){
 
@@ -158,8 +159,7 @@ export default function Home({navigation}){
                             latitudeDelta: 0.005,
                             longitudeDelta: 0.005,
                         }}
-                        mapType="standard"
-                        showsBuildings={true}
+                        mapType="standard"                         showsBuildings={true}
                         style={styles.map}
                         showsMyLocationButton={true}
                         provider="google"

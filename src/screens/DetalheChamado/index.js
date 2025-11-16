@@ -3,19 +3,23 @@ import { Image } from "expo-image";
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import { Ionicons } from "@expo/vector-icons";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useContext } from "react";
 import * as Location from "expo-location";
 import { LocationAccuracy } from "expo-location";
 import styles from "./styles";
 import IconOrigem from "../../components/IconOrigem";
-import { getCallDetails } from "../../services/calls";
+import { getCallDetails, confirmCall } from "../../services/calls";
 import Hatch from "../../assets/images/carhatch.svg";
 import { StatusBar } from "expo-status-bar";
+import { DriverContext } from "../../contexts/DriverContext";
+import Button from "../../components/Button";
 
 const GOOGLE_MAPS_APIKEY = "AIzaSyBS5TYszHyw5VyTUU9gUCWYdNqOQ5pt7ik";
 
-export default function DetalheChamado({ route }) {
+export default function DetalheChamado({ route, navigation }) {
   const { chamado } = route.params;
+  const {driver} = useContext(DriverContext);
+
 
   const [detalhe, setDetalhe] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,6 +27,7 @@ export default function DetalheChamado({ route }) {
 
   const mapRef = useRef(null);
 
+  console.log(driver.id);
   // BUSCA OS DETALHES DO CHAMADO
   useEffect(() => {
     const fetchDetails = async () => {
@@ -88,6 +93,17 @@ export default function DetalheChamado({ route }) {
       );
     }
   }, [posicaoGuincheiro, detalhe]);
+
+  const handleCallConfirm = async () => {
+      try {
+        const response = await confirmCall(chamado.id, driver.id);
+        console.log('Chamado confirmado:', response);
+        navigation.navigate('CallProgress', { chamado: response });
+      }
+      catch (error) {
+        console.error('Erro ao confirmar o chamado:', error);
+      }
+  }
 
   if (loading) {
     return (
@@ -259,10 +275,16 @@ export default function DetalheChamado({ route }) {
               {detalhe.metodo_pagamento?.toUpperCase() || "CARTÃO"}
             </Text>
           </View>
+          <View style={{aligntext:'center',alignItems:'center'}}>
+            <Button
+            text="Confirmar"
+            onPress={handleCallConfirm}
 
-          <TouchableOpacity style={styles.confirmButton}>
+            />
+          </View>
+          {/* <TouchableOpacity style={styles.confirmButton}>
             <Text style={styles.confirmText}>Confirmar</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </View>

@@ -26,3 +26,13 @@ export const getCallDetails = async (callId) => {
         throw error.response ? error.response.data : 'Erro ao conectar com o servidor'; 
     }
 }
+
+export const confirmCall = async (callId, guincheiroId) => {
+    try {
+        const response = await api.post(`/chamados/${callId}/aceitar`, { guincheiro_id: guincheiroId });
+        return response.data;
+    } catch (error) {
+        console.error("Error confirming call:", error);
+        throw error.response ? error.response.data : 'Erro ao conectar com o servidor';
+    }
+}
