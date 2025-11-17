@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import MyTabs from "./bottomTabs";
 
 import { NavigationContainer } from "@react-navigation/native";
 
@@ -16,7 +17,7 @@ export default function Navigation() {
         <NavigationContainer>
             <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }} >
                 <Stack.Screen name="Login" component={Login} />
-                <Stack.Screen name="Home" component={Home} />
+                <Stack.Screen name="Home" component={MyTabs} />
                 <Stack.Screen name="DetalheChamado" component={DetalheChamado} />
                 <Stack.Screen name="CallProgress" component={CallProgress} />
             </Stack.Navigator>
