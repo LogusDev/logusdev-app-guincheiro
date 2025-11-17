@@ -6,6 +6,7 @@ import Login from "../screens/Login";
 import CadastroEmailSenha from "../screens/CadastroEmailSenha";
 import CadastroNomeCpfTelefone from "../screens/CadastroNomeCpfTelefone";
 import CadastroGuincho from "../screens/CadastroGuincho";
+import CadastroDocumentos from "../screens/CadastroDocumentos";
 import { DriverProvider } from "../contexts/DriverContext";
 import Home from "../screens/Home";
 import DetalheChamado from "../screens/DetalheChamado";
@@ -17,12 +18,13 @@ export default function Navigation() {
     return (
         <DriverProvider>
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="CadastroGuincho" screenOptions={{ headerShown: false }} >
-            {/* <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }} > */}
+            {/* <Stack.Navigator initialRouteName="CadastroGuincho" screenOptions={{ headerShown: false }} > */}
+            <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }} >
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="CadastroEmailSenha" component={CadastroEmailSenha} />
                 <Stack.Screen name="CadastroNomeCpfTelefone" component={CadastroNomeCpfTelefone} />
                 <Stack.Screen name="CadastroGuincho" component={CadastroGuincho} />
+                {/* <Stack.Screen name="CadastroDocumentos" component={CadastroDocumentos} /> */}
                 <Stack.Screen name="Home" component={Home} />
                 <Stack.Screen name="DetalheChamado" component={DetalheChamado} />
             </Stack.Navigator>

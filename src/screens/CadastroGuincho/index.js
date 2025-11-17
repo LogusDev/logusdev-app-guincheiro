@@ -16,7 +16,7 @@ import PickerSelect from "../../components/PickerSelect";
 import axios from "axios";
 import Logo from "../../components/Logo";
 
-export default function CadastroGuincho({ navigation }) {
+export default function CadastroGuincho({ navigation, route }) {
   const [guinchos, setGuinchos] = useState([]);
 
   const [marcas, setMarcas] = useState([]);
@@ -31,8 +31,10 @@ export default function CadastroGuincho({ navigation }) {
   const [comprimentoPlataforma, setComprimentoPlataforma] = useState("");
   const [capacidadeValue, setCapacidadeValue] = useState(""); 
 
+  const { email, password, name, cpf: unmaskedCpf, phone: unmaskedPhone, cnh_num } = route.params;
+
   useEffect(() => {
-    axios.get("http://192.168.15.9:3333/guinchos")
+    axios.get("http://192.168.15.8:3333/guinchos")
       .then(res => {
         setGuinchos(res.data);
 
@@ -92,13 +94,22 @@ export default function CadastroGuincho({ navigation }) {
       return;
     }
 
+    navigation.navigate("Home", {email,password,name,cpf: unmaskedCpf,phone: unmaskedPhone,cnh_num,anoSelecionado,modeloSelecionado,marcaSelecionada,});
+
     console.log({
-      marcaSelecionada,
-      modeloSelecionado,
-      anoSelecionado,
-      capacidade,
-      comprimentoPlataforma
+        email,
+        password,
+        name,
+        unmaskedCpf,
+        unmaskedPhone,
+        cnh_num,
+        marcaSelecionada,
+        modeloSelecionado,
+        anoSelecionado,
+        capacidade: capacidadeValue,
+        comprimentoPlataforma
     });
+
   }
 
   return (
