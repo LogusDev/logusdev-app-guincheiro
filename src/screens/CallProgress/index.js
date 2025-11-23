@@ -14,7 +14,7 @@ import { io } from 'socket.io-client';
 import api from '../../services/api';
 import Button from '../../components/Button';
 
-const GOOGLE_MAPS_APIKEY = "AIzaSyBS5TYszHyw5VyTUU9gUCWYdNqOQ5pt7ik";
+const GOOGLE_MAPS_APIKEY = "AIzaSyBkx6mo29bFuoPzoNSLpE97c8EoWptHl1M";
 
 // --- Função Haversine (cálculo manual) ---
 const calcularDistancia = (lat1, lon1, lat2, lon2) => {
@@ -405,7 +405,7 @@ export default function CallProgress({ route, navigation }) {
                     </View>
                 ) : (
                     // Se JÁ chegou, mostra o botão de finalizar
-                    <View style={styles.communicationContainer}>
+                    <View style={{alignItems:'center'}}>
                         {/* <TouchableOpacity
                             style={{ // Estilo inline para o botão de finalizar
                                 backgroundColor: '#28a745', // Verde "sucesso"
@@ -427,7 +427,7 @@ export default function CallProgress({ route, navigation }) {
                                 Finalizar Chamado
                             </Text>
                         </TouchableOpacity> */}
-                        <Button text="Cancelar Chamado" onPress={handleFinalizarChamado} />
+                        <Button text="Finalizar" onPress={handleFinalizarChamado} />
                     </View>
                 )}
                 {/* --- FIM DA MUDANÇA --- */}

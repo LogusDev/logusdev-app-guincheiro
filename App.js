@@ -1,6 +1,11 @@
 import StackNavigator from './src/navigation/stack';
 import { useFonts } from 'expo-font';
-import Toast from 'react-native-toast-message';
+import Toast from 'react-native-toast-message';import { LogBox } from 'react-native';
+
+// Ignora logs que começam com o texto específico
+LogBox.ignoreAllLogs();
+
+// ... resto do seu código (import React, App, etc.)
 
 
 export default function App(){
