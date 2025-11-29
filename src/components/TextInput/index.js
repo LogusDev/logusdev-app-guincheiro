@@ -3,23 +3,36 @@ import {View,Text,TextInput} from "react-native";
 import {Ionicons} from '@expo/vector-icons';
 
 
-export default function TextInputComponent({label,placeholder,value,onChangeText,secureTextEntry,name,keyboardType,readOnly,size,style}){
-    return(
-        <View style={styles.container}>
-            <Ionicons style={{marginRight:10}} name={name} size={size || 20} color="#A7A7A7" />
-            <TextInput
-                style={[styles.input, style]}
-                placeholder={placeholder}
-                value={value}
-                placeholderTextColor={'#000000'}
-                onChangeText={onChangeText}
-                secureTextEntry={secureTextEntry}
-                keyboardType={keyboardType}
-                readOnly={readOnly}
-            />
-        </View>
-    )
+export default function TextInputComponent({
+  label,
+  placeholder,
+  value,
+  onChangeText,
+  secureTextEntry,
+  name,
+  keyboardType,
+  readOnly,
+  size,
+  style,
+  placeholderTextColor,
+}) {
+  return (
+    <View style={styles.container}>
+      <Ionicons style={{ marginRight: 10 }} name={name} size={size || 20} color="#A7A7A7" />
+      <TextInput
+        style={[styles.input, style]}
+        placeholder={placeholder}
+        value={value}
+        placeholderTextColor={placeholderTextColor || '#000000'}
+        onChangeText={onChangeText}
+        secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}
+        editable={readOnly === undefined ? true : !readOnly} 
+      />
+    </View>
+  );
 }
+
 
 const styles = StyleSheet.create({
     container:{
