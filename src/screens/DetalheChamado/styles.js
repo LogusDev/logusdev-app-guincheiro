@@ -174,4 +174,17 @@ export default StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 1,
   },
+  refuseButton: {
+    backgroundColor: "#E53935",
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  refuseButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "700",
+    letterSpacing: 1,
+  },
 });
