@@ -54,7 +54,7 @@ export const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontWeight: 'bold',
-        fontSize: 17,
+        fontSize: 16,
     },
     clientesContainer: {
         flex: 1,

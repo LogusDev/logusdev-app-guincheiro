@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Animated, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Animated, ScrollView, Modal } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { styles } from './styles';
 import { getCurrentPositionAsync, LocationAccuracy, requestForegroundPermissionsAsync, watchPositionAsync } from "expo-location";
@@ -11,9 +11,13 @@ import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { Video } from 'expo-av';
 import SearchingVideo from '../../assets/images/searching.gif';
 import { getCallsWaiting } from '../../services/calls';
+import { lightMapStyle } from '../../utils/mapStyle';
+import { DriverContext } from '../../contexts/DriverContext';
+import { useContext } from 'react';
 
 export default function Home({navigation}){
 
+    const { driver } = useContext(DriverContext);
     const [location, setLocation] = useState(null);
     const [permissionDenied, setPermissionDenied] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -45,9 +49,15 @@ export default function Home({navigation}){
 
     const fetchCalls = async () => {
         try {
+            if (!driver?.id) {
+                console.log("Guincheiro não logado");
+                setChamados([]);
+                return;
+            }
+
             const { latitude, longitude } = location;
 
-            const data = await getCallsWaiting(latitude, longitude);
+            const data = await getCallsWaiting(latitude, longitude, driver.id);
 
             if (Array.isArray(data)) {
                 setChamados(data);
@@ -134,9 +144,15 @@ export default function Home({navigation}){
 
     if (isLoading) {
         return (
-            <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
-                <LoadingScreen />
-            </Animated.View>
+            <Modal
+                visible={true}
+                transparent={false}
+                animationType="fade"
+            >
+                <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+                    <LoadingScreen />
+                </Animated.View>
+            </Modal>
         );
     }
 
@@ -158,8 +174,7 @@ export default function Home({navigation}){
                             latitudeDelta: 0.005,
                             longitudeDelta: 0.005,
                         }}
-                        mapType="standard"
-                        showsBuildings={true}
+                        mapType="standard"                         showsBuildings={true}
                         style={styles.map}
                         showsMyLocationButton={true}
                         provider="google"

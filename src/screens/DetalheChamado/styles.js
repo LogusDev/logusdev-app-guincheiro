@@ -4,23 +4,22 @@ export default StyleSheet.create({
   card: {
     width: "100%",
     backgroundColor: "#fff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: 26,
-    paddingTop: 24,
-    paddingBottom: 34,
-    elevation: 12,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 30,
+    borderRadius: 16,
     shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: -4 },
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
 
   title: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
-    color: "#000",
-    marginBottom: 16,
+    color: "#1F284E",
+    marginBottom: 20,
     textAlign: "center",
   },
 
@@ -34,6 +33,8 @@ export default StyleSheet.create({
     height: 64,
     borderRadius: 32,
     marginRight: 12,
+    borderWidth: 2,
+    borderColor: "#FFB100",
   },
   nome: {
     fontSize: 20,
@@ -41,39 +42,55 @@ export default StyleSheet.create({
     color: "#1F284E",
   },
 
-  // Endereços
   addressBox: {
     marginBottom: 20,
   },
   addressRow: {
     flexDirection: "row",
     alignItems: "flex-start",
+    marginBottom: 0,
+  },
+  iconContainer: {
+    width: 28,
+    alignItems: "center",
+    marginTop: 2,
+  },
+  addressContent: {
+    flex: 1,
+    marginLeft: 10,
   },
   addressTitle: {
     fontSize: 16,
     color: "#1F284E",
-    fontWeight: "bold",
+    fontWeight: "600",
+    marginBottom: 4,
   },
   addressText: {
     fontSize: 14,
     color: "#6C6C6C",
-    marginTop: 2,
+    lineHeight: 20,
   },
 
   dottedLineContainer: {
-    height: 28,
-    width: 20,
+    height: 24,
+    width: 28,
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: -4,
-    marginLeft: 8,
+    marginLeft: 0,
+    marginVertical: 4,
   },
   dottedLine: {
-    height: "100%",
-    width: 1,
-    borderLeftWidth: 2,
-    borderStyle: "dotted",
-    borderColor: "#C0C0C0",
+    height: 24,
+    width: 2,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 3,
+  },
+  dottedDot: {
+    width: 3,
+    height: 3,
+    backgroundColor: "#C0C0C0",
+    borderRadius: 1.5,
   },
 
   divider: {
@@ -82,24 +99,45 @@ export default StyleSheet.create({
     marginVertical: 14,
   },
 
-  // Carro
   carRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 14,
-    marginTop: 12,
+    marginBottom: 16,
+    marginTop: 16,
   },
+  carIconContainer: {
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  carInfoContainer: {
+    flex: 1,
+  },
+  carModel: {
+    fontSize: 16,
+    color: "#1F284E",
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  carDetails: {
+    fontSize: 14,
+    color: "#1F284E",
+    lineHeight: 20,
+  },
+
   carImage: {
     width: 55,
     height: 28,
     marginRight: 10,
   },
+
   carInfo: {
     fontSize: 16,
     color: "#1F284E",
   },
 
-  // Valor e pagamento
   priceRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -114,6 +152,7 @@ export default StyleSheet.create({
     fontSize: 18,
     color: "#20B26A",
     fontWeight: "700",
+    marginLeft: 4,
   },
   payment: {
     fontSize: 16,
@@ -122,7 +161,6 @@ export default StyleSheet.create({
     marginLeft: 8,
   },
 
-  // Botão Confirmar
   confirmButton: {
     backgroundColor: "#1F284E",
     borderRadius: 16,
@@ -131,7 +169,20 @@ export default StyleSheet.create({
     marginTop: 22,
   },
   confirmText: {
-    color: "#fff",
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "700",
+    letterSpacing: 1,
+  },
+  refuseButton: {
+    backgroundColor: "#E53935",
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  refuseButtonText: {
+    color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "700",
     letterSpacing: 1,

@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import MyTabs from "./bottomTabs";
 
 import { NavigationContainer } from "@react-navigation/native";
 
@@ -10,6 +11,7 @@ import CadastroDocumentos from "../screens/CadastroDocumentos";
 import { DriverProvider } from "../contexts/DriverContext";
 import Home from "../screens/Home";
 import DetalheChamado from "../screens/DetalheChamado";
+import CallProgress from "../screens/CallProgress";
 
 
 const Stack = createNativeStackNavigator();
@@ -25,8 +27,9 @@ export default function Navigation() {
                 <Stack.Screen name="CadastroNomeCpfTelefone" component={CadastroNomeCpfTelefone} />
                 <Stack.Screen name="CadastroGuincho" component={CadastroGuincho} />
                 {/* <Stack.Screen name="CadastroDocumentos" component={CadastroDocumentos} /> */}
-                <Stack.Screen name="Home" component={Home} />
+                <Stack.Screen name="Home" component={MyTabs} />
                 <Stack.Screen name="DetalheChamado" component={DetalheChamado} />
+                <Stack.Screen name="CallProgress" component={CallProgress} />
             </Stack.Navigator>
         </NavigationContainer>
         </DriverProvider>

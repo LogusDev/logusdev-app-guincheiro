@@ -5,11 +5,11 @@ import { DriverContext } from "../../contexts/DriverContext";
 
 export default function PhotoCard(){
     const { driver } = useContext(DriverContext);
-
+    console.log(driver.foto_url)
     return(
         <View>
             <Image
-            src={driver.foto_url}
+            source={{ uri: driver.foto_url }    }
             width={59}
             height={59}
             style={{borderRadius:40,borderColor:'#EF8108',borderWidth:3}}
