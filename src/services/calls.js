@@ -57,3 +57,13 @@ export const updateCall = async (callId, body) => {
         throw error.response ? error.response.data : 'Erro ao conectar com o servidor';
     }
 }
+
+export const getMessages = async (callId) => {
+    try {
+        const response = await api.get(`/mensagens/${callId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Erro ao buscar mensagens:', error);
+        return [];
+    }
+};
