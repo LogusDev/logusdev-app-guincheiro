@@ -239,8 +239,7 @@ export default function CallProgress({ route, navigation }) {
     };
 
     const handleChat = () => {
-        console.log('Abrir chat com cliente');
-        // navigation.navigate('Chat', { chamado, detalhe });
+        navigation.navigate('Chat', { chamado, detalhe });
     };
 
     const handleCall = () => {

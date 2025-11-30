@@ -14,6 +14,7 @@ import Home from "../screens/Home";
 import DetalheChamado from "../screens/DetalheChamado";
 import CallProgress from "../screens/CallProgress";
 import EditProfile from "../screens/EditProfile";
+import Chat from "../screens/Chat";
 
 
 const Stack = createNativeStackNavigator();
@@ -34,6 +35,7 @@ export default function Navigation() {
                 <Stack.Screen name="EditProfile" component={EditProfile} />
                 <Stack.Screen name="DetalheChamado" component={DetalheChamado} />
                 <Stack.Screen name="CallProgress" component={CallProgress} />
+                <Stack.Screen name="Chat" component={Chat} />
             </Stack.Navigator>
         </NavigationContainer>
         </DriverProvider>

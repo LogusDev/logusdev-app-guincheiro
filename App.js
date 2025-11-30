@@ -2,6 +2,7 @@ import StackNavigator from './src/navigation/stack';
 import { useFonts } from 'expo-font';
 import Toast from 'react-native-toast-message';
 import { LogBox } from 'react-native';
+import './src/services/firebase'; // Inicializa o Firebase
 
 // Ignora logs que começam com o texto específico
 LogBox.ignoreAllLogs();
