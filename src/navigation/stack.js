@@ -13,6 +13,8 @@ import { DriverProvider } from "../contexts/DriverContext";
 import Home from "../screens/Home";
 import DetalheChamado from "../screens/DetalheChamado";
 import CallProgress from "../screens/CallProgress";
+import ActivityScreen from "../screens/ActivityScreen";
+import ReceiptScreen from "../screens/ReceiptScreen";
 import EditProfile from "../screens/EditProfile";
 import Chat from "../screens/Chat";
 import TowCarSelection from "../screens/TowCarSelection";
@@ -36,6 +38,8 @@ export default function Navigation() {
                 <Stack.Screen name="EditProfile" component={EditProfile} />
                 <Stack.Screen name="DetalheChamado" component={DetalheChamado} />
                 <Stack.Screen name="CallProgress" component={CallProgress} />
+                <Stack.Screen name="ActivityScreen" component={ActivityScreen} />
+                <Stack.Screen name="ReceiptScreen" component={ReceiptScreen} />
                 <Stack.Screen name="Chat" component={Chat} />
                 <Stack.Screen name="TowCarSelection" component={TowCarSelection} />
             </Stack.Navigator>
