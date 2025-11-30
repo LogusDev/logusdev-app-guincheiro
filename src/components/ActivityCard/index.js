@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ActivityCard({ activity }) {
   const navigation = useNavigation();
@@ -50,10 +50,10 @@ export default function ActivityCard({ activity }) {
             <Ionicons
               name="timer-outline"
               size={16}
-              margin={2}
               color="#888"
-              style={styles.timeIcon}
+              style={{ marginHorizontal: 2 }}
             />
+
             <Text style={styles.time}>{endTime}</Text>
           </View>
         </View>
