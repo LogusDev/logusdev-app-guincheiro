@@ -13,7 +13,6 @@ import { getCallDetails, confirmCall, refuseCall } from "../../services/calls";
 import Hatch from "../../assets/images/carhatch.svg";
 import { StatusBar } from "expo-status-bar";
 import { DriverContext } from "../../contexts/DriverContext";
-import Button from "../../components/Button";
 
 const GOOGLE_MAPS_APIKEY = "AIzaSyBkx6mo29bFuoPzoNSLpE97c8EoWptHl1M";
 
@@ -320,12 +319,12 @@ export default function DetalheChamado({ route, navigation }) {
             >
               <Text style={styles.refuseButtonText}>Recusar</Text>
             </TouchableOpacity>
-            <View style={{ flex: 1 }}>
-              <Button
-                text="Confirmar"
-                onPress={handleCallConfirm}
-              />
-            </View>
+            <TouchableOpacity
+              style={[styles.confirmButton, { flex: 1, marginTop: 0 }]}
+              onPress={handleCallConfirm}
+            >
+              <Text style={styles.confirmText}>Confirmar</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

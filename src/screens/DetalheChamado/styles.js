@@ -166,7 +166,8 @@ export default StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 16,
     alignItems: "center",
-    marginTop: 22,
+    justifyContent: "center",
+    minHeight: 56,
   },
   confirmText: {
     color: "#FFFFFF",
@@ -180,6 +181,7 @@ export default StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
+    minHeight: 56,
   },
   refuseButtonText: {
     color: "#FFFFFF",
