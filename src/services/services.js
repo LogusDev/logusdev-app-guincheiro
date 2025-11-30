@@ -10,6 +10,42 @@ export const registerDriver = async (driverData) => {
     }
 };
 
+export const registerGuincheiro = async (guincheiroData) => {
+    try {
+        console.log('[SERVICE] registerGuincheiro - Enviando dados:', guincheiroData);
+        const response = await api.post('/guincheiros', guincheiroData);
+        console.log('[SERVICE] registerGuincheiro - Resposta:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('[SERVICE] registerGuincheiro - Erro:', error.response?.data || error.message);
+        throw error.response ? error.response.data : 'Erro ao conectar com o servidor';
+    }
+};
+
+export const createGuincho = async (guinchoData) => {
+    try {
+        console.log('[SERVICE] createGuincho - Enviando dados:', guinchoData);
+        const response = await api.post('/guinchos', guinchoData);
+        console.log('[SERVICE] createGuincho - Resposta:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('[SERVICE] createGuincho - Erro:', error.response?.data || error.message);
+        throw error.response ? error.response.data : 'Erro ao conectar com o servidor';
+    }
+};
+
+export const criarValoresGuincho = async (valoresData) => {
+    try {
+        console.log('[SERVICE] criarValoresGuincho - Enviando dados:', valoresData);
+        const response = await api.post('/valores-guincho', valoresData);
+        console.log('[SERVICE] criarValoresGuincho - Resposta:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('[SERVICE] criarValoresGuincho - Erro:', error.response?.data || error.message);
+        throw error.response ? error.response.data : 'Erro ao conectar com o servidor';
+    }
+};
+
 
 export const updateDriver = async (id, driverData) => {
     try {

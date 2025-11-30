@@ -1,174 +1,265 @@
-// import React, { useState, useContext } from 'react';
-// import { View, Alert, ActivityIndicator, StatusBar, Image, Text } from 'react-native';
-// import * as ImagePicker from 'expo-image-picker';
-// import Toast from 'react-native-toast-message';
+import React, { useState } from 'react';
+import { View, ActivityIndicator, StatusBar, Image, Text, TouchableOpacity } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import Toast from 'react-native-toast-message';
+import styles from './styles.js';
+import Button from '../../components/Button/index.js';
+import PhotoPicker from '../../components/PhotoPicker/index.js';
+import Logo from '../../components/Logo/index.js';
+import { uploadFotoPorEmail } from '../../services/upload.js';
+import { registerGuincheiro, createGuincho, criarValoresGuincho } from '../../services/services.js';
 
-// import styles from './styles.js';
-// import Button from '../../components/Button/index.js';
-// import PhotoPicker from '../../components/PhotoPicker/index.js';
-// import Logo from '../../components/Logo/index.js';
+export default function CadastroDocumentos({ route, navigation }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedFotoMotorista, setSelectedFotoMotorista] = useState(null);
 
-// import { uploadFotoPorEmail } from '../../services/upload.js';
-// import { registerUser, createVehicle } from '../../services/services.js';
+  const {
+    email,
+    password,
+    name,
+    cpf: unmaskedCpf,
+    phone: unmaskedPhone,
+    cnh_num,
+    anoSelecionado,
+    modeloSelecionado,
+    marcaSelecionada,
+    capacidade,
+    comprimentoPlataforma,
+    placa,
+    valorSaida,
+    valorPorKm
+  } = route.params;
 
-// export default function CadastroDocumentos({ route, navigation }) {
-  
-//   const {
-//     email,
-//     password,
-//     name,
-//     cpf: unmaskedCpf,
-//     phone: unmaskedPhone,
-//     cnh_num,
-//     anoSelecionado,
-//     modeloSelecionado,
-//     marcaSelecionada,
-//     capacidadeValue,
-//     comprimentoPlataforma
-//   } = route.params;
+  const successAlert = () => {
+    Toast.show({
+      type: 'success',
+      text1: 'Usuário cadastrado com sucesso',
+      position: 'top',
+      visibilityTime: 1500,
+    });
+  };
 
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [selectedImage, setSelectedImage] = useState(null);
+  const errorAlert = () => {
+    Toast.show({
+      type: 'error',
+      text1: 'Erro ao cadastrar',
+      text2: 'Verifique os dados e tente novamente',
+      position: 'bottom',
+      visibilityTime: 1500,
+      bottomOffset: 300
+    });
+  };
 
-//   const successAlert = () => {
-//     Toast.show({
-//       type: 'success',
-//       text1: 'Usuário cadastrado com sucesso',
-//       position: 'top',
-//       visibilityTime: 1500,
-//     });
-//   };
+  const handleSelectImage = async (setImage) => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Toast.show({
+          type: 'error',
+          text1: 'Permissão necessária',
+          text2: 'Precisamos acessar suas fotos para fazer o upload',
+          position: 'bottom',
+          visibilityTime: 2000,
+        });
+        return;
+      }
 
-//   const errorAlert = () => {
-//     Toast.show({
-//       type: 'error',
-//       text1: 'Erro ao cadastrar',
-//       text2: 'Verifique os dados e tente novamente',
-//       position: 'bottom',
-//       visibilityTime: 1500,
-//       bottomOffset: 300
-//     });
-//   };
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.7,
+      });
 
-//   // Seleção da imagem
-//   const handleSelectImage = async () => {
-//     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-//     if (status !== 'granted') {
-//       Alert.alert('Permissão necessária', 'Precisamos acessar suas fotos para continuar');
-//       return;
-//     }
+      if (!result.canceled && result.assets?.[0]) {
+        setImage(result.assets[0]);
+      }
+    } catch (error) {
+      console.error('Erro ao selecionar imagem:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Erro',
+        text2: 'Não foi possível selecionar a imagem',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+    }
+  };
 
-//     const result = await ImagePicker.launchImageLibraryAsync({
-//       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-//       allowsEditing: true,
-//       aspect: [1, 1],
-//       quality: 0.7,
-//     });
+  const handleUpload = async (imagem, email) => {
+    return await uploadFotoPorEmail(email, imagem);
+  };
 
-//     if (!result.canceled && result.assets?.[0]) {
-//       setSelectedImage(result.assets[0]);
-//     }
-//   };
+  const handleSignIn = async () => {
+    console.log('=== INÍCIO DO CADASTRO ===');
+    console.log('Dados recebidos:', {
+      email,
+      name,
+      cpf: unmaskedCpf,
+      phone: unmaskedPhone,
+      cnh_num,
+      anoSelecionado,
+      modeloSelecionado,
+      marcaSelecionada,
+      capacidade,
+      comprimentoPlataforma,
+      placa,
+      valorSaida,
+      valorPorKm
+    });
 
-//   // Upload da foto
-//   const handleUpload = async (imagem) => {
-//     return await uploadFotoPorEmail(email, imagem);
-//   };
+    if (!selectedFotoMotorista) {
+      console.log('❌ Erro: Foto do motorista não selecionada');
+      Toast.show({
+        type: 'error',
+        text1: 'Atenção',
+        text2: 'Selecione a foto do motorista!',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+      return;
+    }
 
-//   // Finalizar cadastro
-//   const handleSignIn = async () => {
-//     if (!selectedImage) {
-//       Alert.alert('Selecione uma imagem antes de cadastrar!');
-//       return;
-//     }
+    setIsLoading(true);
 
-//     setIsLoading(true);
+    try {
+      console.log('📤 Iniciando upload da foto do motorista...');
+      // Upload da foto do motorista
+      const uploadFotoMotorista = await handleUpload(selectedFotoMotorista, email);
+      console.log('✅ Upload da foto concluído:', uploadFotoMotorista);
 
-//     try {
-//       // Upload da foto
-//       const uploadResult = await handleUpload(selectedImage);
+      // Validação rigorosa do upload
+      if (!uploadFotoMotorista?.success || !uploadFotoMotorista?.data?.fotoUrl) {
+        console.log('❌ Erro: Upload da foto falhou:', uploadFotoMotorista);
+        throw new Error('Falha ao enviar foto do motorista');
+      }
 
-//       if (!uploadResult || !uploadResult.success || !uploadResult.data?.fotoUrl) {
-//         Alert.alert('Erro no Upload', 'Falha ao enviar a foto. Tente novamente.');
-//         setIsLoading(false);
-//         return;
-//       }
+      console.log('📝 Foto URL obtida:', uploadFotoMotorista.data.fotoUrl);
 
-//       // Cadastro do usuário
-//       const userPayload = {
-//         nome: name,
-//         cpf: unmaskedCpf,
-//         telefone: unmaskedPhone,
-//         email,
-//         senha: password,
-//         cnh_num: cnh_num,
-//         foto_url: uploadResult.data.fotoUrl
-//       };
+      // Cadastro do guincheiro
+      const guincheiroPayload = {
+        nome: name,
+        cpf: unmaskedCpf,
+        telefone: unmaskedPhone,
+        email,
+        senha: password,
+        cnh_num: '25461235231',
+        foto_url: uploadFotoMotorista.data.fotoUrl
+      };
 
-//       const userRes = await registerUser(userPayload);
-//       const id = userRes.id;
-
-//       // Tratar ano (caso venha com textinho a mais)
-//       const ano = anoSelecionado.slice(0, 4);
-
-//       // Cadastro do guincho
-//       const vehiclePayload = {
-//         placa: "ABC1234", 
-//         marca: marcaSelecionada,
-//         modelo: modeloSelecionado,
-//         ano_fabricacao: ano,
-//         capacidade: capacidadeValue,
-//         comprimento: comprimentoPlataforma,
-//         cliente_id: id
-//       };
-
-//       await createVehicle(vehiclePayload);
-
-//       successAlert();
-
-//       navigation.navigate('Login', {
-//         fotoUrl: uploadResult.data.fotoUrl
-//       });
-
-//     } catch (error) {
-//       console.error('Erro ao cadastrar:', error);
-//       errorAlert();
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <StatusBar barStyle={'light-content'} />
+      console.log('👤 Cadastrando guincheiro com payload:', guincheiroPayload);
+      const guincheiroRes = await registerGuincheiro(guincheiroPayload);
+      console.log('✅ Guincheiro cadastrado com sucesso:', guincheiroRes);
       
-//       <Logo />
-//       <Image source={require('../../assets/images/register.png')} />
+      const guincheiroId = guincheiroRes.id;
+      console.log('🆔 ID do guincheiro:', guincheiroId);
 
-//       <Text style={styles.texto}>Verificação de documentos</Text>
-//       <Text style={styles.texto2}>
-//         Envie a foto solicitada abaixo para validar sua conta como Guincheiro.
-//       </Text>
+      if (!guincheiroId) {
+        throw new Error('ID do guincheiro não foi retornado');
+      }
 
-//       <PhotoPicker onPress={handleSelectImage} name={'albums-outline'} />
+      // Tratar ano (caso venha com textinho a mais)
+      const ano = typeof anoSelecionado === 'string' 
+        ? anoSelecionado.slice(0, 4) 
+        : String(anoSelecionado).slice(0, 4);
+      console.log('📅 Ano processado:', ano);
 
-//       {selectedImage && (
-//         <Image
-//           source={{ uri: selectedImage.uri }}
-//           style={{
-//             width: 120,
-//             height: 120,
-//             alignSelf: 'center',
-//             marginVertical: 10,
-//             borderRadius: 10
-//           }}
-//         />
-//       )}
+      // Cadastro do guincho
+      const guinchoPayload = {
+        placa: placa,
+        marca: marcaSelecionada,
+        modelo: modeloSelecionado,
+        ano_fabricacao: parseInt(ano),
+        capacidade: parseFloat(capacidade),
+        comprimento_plataforma: parseFloat(comprimentoPlataforma),
+        guincheiro_id: guincheiroId
+      };
 
-//       <Button
-//         text={isLoading ? <ActivityIndicator size="small" color="#fff" /> : "Cadastrar"}
-//         onPress={handleSignIn}
-//       />
-//     </View>
-//   );
-// }
+      console.log('🚗 Cadastrando guincho com payload:', guinchoPayload);
+      const guinchoRes = await createGuincho(guinchoPayload);
+      console.log('✅ Guincho cadastrado com sucesso:', guinchoRes);
+
+      // Cadastro dos valores do guincho na tabela ValoresGuincho
+      const valoresPayload = {
+        idGuincheiro: guincheiroId,
+        valorSaida: parseFloat(valorSaida),
+        valorKm: parseFloat(valorPorKm)
+      };
+
+      console.log('💰 Cadastrando valores do guincho com payload:', valoresPayload);
+      const valoresRes = await criarValoresGuincho(valoresPayload);
+      console.log('✅ Valores cadastrados com sucesso:', valoresRes);
+
+      console.log('✅ === CADASTRO CONCLUÍDO COM SUCESSO ===');
+      successAlert();
+
+      setTimeout(() => {
+        navigation.navigate('Login', {
+          fotoUrl: uploadFotoMotorista.data.fotoUrl
+        });
+      }, 1500);
+
+    } catch (error) {
+      console.error('❌ === ERRO NO CADASTRO ===');
+      console.error('Tipo do erro:', error?.constructor?.name);
+      console.error('Mensagem do erro:', error?.message);
+      console.error('Stack do erro:', error?.stack);
+      console.error('Resposta completa do erro:', error?.response?.data || error);
+      console.error('Status do erro:', error?.response?.status);
+      console.error('=== FIM DO ERRO ===');
+      
+      Toast.show({
+        type: 'error',
+        text1: 'Erro ao cadastrar',
+        text2: error?.response?.data?.error || error?.message || 'Verifique os dados e tente novamente',
+        position: 'bottom',
+        visibilityTime: 3000,
+        bottomOffset: 300
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle={'light-content'} />
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        enableOnAndroid={true}
+        extraScrollHeight={20}
+      >
+        <Logo />
+        <Image source={require('../../assets/images/register.png')} />
+        
+        <Text style={styles.texto}>Verificação de documentos</Text>
+        <Text style={styles.texto2}>
+          Envie a imagem solicitada abaixo para validar sua conta GuinchAqui.
+        </Text>
+
+        <PhotoPicker 
+          onPress={() => handleSelectImage(setSelectedFotoMotorista)} 
+          name={'person-outline'} 
+          label={'Foto do motorista'}
+        />
+        {selectedFotoMotorista && (
+          <Image
+            source={{ uri: selectedFotoMotorista.uri }}
+            style={{ width: 120, height: 120, alignSelf: 'center', marginVertical: 10, borderRadius: 10 }}
+          />
+        )}
+
+        <View style={{ width: '100%', alignItems: 'center', marginTop: 20, marginBottom: 30 }}>
+          <Button 
+            text={isLoading ? <ActivityIndicator size="small" color="#ffffff" /> : "Continuar"} 
+            onPress={handleSignIn} 
+          />
+        </View>
+      </KeyboardAwareScrollView>
+    </View>
+  );
+}

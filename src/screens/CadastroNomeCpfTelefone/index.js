@@ -1,6 +1,9 @@
-import {View,Text,Image, StatusBar} from 'react-native';
+import {View,Text,Image, StatusBar, TouchableOpacity} from 'react-native';
 import {useState} from 'react';
+import Toast from 'react-native-toast-message';
 import {useNavigation} from '@react-navigation/native';
+import {Ionicons} from '@expo/vector-icons';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styles from './styles.js';
 import TextInputComponent from '../../components/TextInput/index.js';
 import Button from '../../components/Button/index.js';
@@ -31,7 +34,13 @@ export default function CadastroNomeCpfTelefone({route}){
     const handleSignIn = async () => {
 
         if (!name || !cpf || !phone) {
-            alert('Preencha todos os campos!');
+            Toast.show({
+                type: 'error',
+                text1: 'Atenção',
+                text2: 'Preencha todos os campos!',
+                position: 'bottom',
+                visibilityTime: 2000,
+            });
             return;
         }
 
@@ -48,13 +57,21 @@ export default function CadastroNomeCpfTelefone({route}){
     return(
         <View style={styles.container}>
             <StatusBar barStyle={'light-content'} />
-            <Logo/>
-            <Image source={require('../../assets/images/register.png')} />
-            <Text style={styles.texto}>Dados Pessoais</Text>
-            <TextInputComponent placeholder="Nome completo..." name="person-outline" value={name} onChangeText={setName} />
-            <TextInputComponent placeholder="CPF..." name="document-text-outline" secureTextEntry={false}  value={cpf} onChangeText={handleCpfChange} keyboardType='numeric' />
-            <TextInputComponent placeholder="Número do Celular..." name="call-outline" secureTextEntry={false} onChangeText={handleCelChange} value={phone} keyboardType='numeric' />
-            <Button text={'Proximo'} onPress={handleSignIn}  />
+            <KeyboardAwareScrollView
+                contentContainerStyle={styles.scrollContainer}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+                enableOnAndroid={true}
+                extraScrollHeight={20}
+            >
+                <Logo/>
+                <Image source={require('../../assets/images/register.png')} />
+                <Text style={styles.texto}>Dados Pessoais</Text>
+                <TextInputComponent placeholder="Nome completo..." name="person-outline" value={name} onChangeText={setName} />
+                <TextInputComponent placeholder="CPF..." name="document-text-outline" secureTextEntry={false}  value={cpf} onChangeText={handleCpfChange} keyboardType='numeric' />
+                <TextInputComponent placeholder="Número do Celular..." name="call-outline" secureTextEntry={false} onChangeText={handleCelChange} value={phone} keyboardType='numeric' />
+                <Button style={{ marginBottom: 30 }} text={'Proximo'} onPress={handleSignIn}  />
+            </KeyboardAwareScrollView>
         </View>
     )
 }

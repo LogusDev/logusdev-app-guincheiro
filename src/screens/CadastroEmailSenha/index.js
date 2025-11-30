@@ -1,13 +1,12 @@
 import {
-  ScrollView, // Importe o ScrollView
   Text,
   Image,
   StatusBar,
-  KeyboardAvoidingView,
-  Platform,
   View
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useState } from 'react';
+import Toast from 'react-native-toast-message';
 // ... outras importações
 import styles from './styles.js';
 import TextInputComponent from '../../components/TextInput/index.js';
@@ -22,36 +21,57 @@ export default function CadastroEmailSenha({ navigation }) {
   function handleRegister() {
     // ... sua lógica de validação continua a mesma
     if (email === "" || password === "" || passwordRepeat === "") {
-      alert("Preencha todos os campos!");
+      Toast.show({
+        type: 'error',
+        text1: 'Atenção',
+        text2: 'Preencha todos os campos!',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
       return;
     }
     if (password !== passwordRepeat) {
-      alert("As senhas não coincidem!");
+      Toast.show({
+        type: 'error',
+        text1: 'Erro',
+        text2: 'As senhas não coincidem!',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
       return;
     }
     if (!email.includes('@') || !email.includes('.')) {
-      alert('E-mail inválido!');
+      Toast.show({
+        type: 'error',
+        text1: 'Erro',
+        text2: 'E-mail inválido!',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
       return;
     }
     if (password.length < 6) {
-      alert('A senha deve ter pelo menos 6 caracteres');
+      Toast.show({
+        type: 'error',
+        text1: 'Erro',
+        text2: 'A senha deve ter pelo menos 6 caracteres',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
       return;
     }
     navigation.navigate('CadastroNomeCpfTelefone', { email, password });
   }
 
   return (
-    <KeyboardAvoidingView
-      // É uma boa prática usar 'padding' para iOS e 'height' para Android
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container} // style={ {flex: 1} } é essencial aqui
-    >
+    <View style={styles.container}>
       <StatusBar barStyle={'light-content'} backgroundColor={'#ffffff'} />
-      
-      {/* Envolva todo o conteúdo rolável em um ScrollView */}
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer} // Estilo para o conteúdo interno
-        keyboardShouldPersistTaps="handled" // Ajuda a fechar o teclado ao tocar fora
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        enableOnAndroid={true}
+        extraScrollHeight={20}
       >
         <Logo />
         <Image source={require('../../assets/images/register.png')} />
@@ -60,7 +80,7 @@ export default function CadastroEmailSenha({ navigation }) {
         <TextInputComponent placeholder="Senha..." name="lock-closed-outline" secureTextEntry={true} value={password} onChangeText={setPassword} />
         <TextInputComponent placeholder="Repita sua senha..." name="lock-closed-outline" secureTextEntry={true} onChangeText={setPasswordRepeat} value={passwordRepeat} />
         <Button text={'Próximo'} onPress={handleRegister} />
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
+    </View>
   );
 }

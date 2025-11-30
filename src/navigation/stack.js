@@ -7,6 +7,7 @@ import Login from "../screens/Login";
 import CadastroEmailSenha from "../screens/CadastroEmailSenha";
 import CadastroNomeCpfTelefone from "../screens/CadastroNomeCpfTelefone";
 import CadastroGuincho from "../screens/CadastroGuincho";
+import CadastroPrecos from "../screens/CadastroPrecos";
 import CadastroDocumentos from "../screens/CadastroDocumentos";
 import { DriverProvider } from "../contexts/DriverContext";
 import Home from "../screens/Home";
@@ -27,7 +28,8 @@ export default function Navigation() {
                 <Stack.Screen name="CadastroEmailSenha" component={CadastroEmailSenha} />
                 <Stack.Screen name="CadastroNomeCpfTelefone" component={CadastroNomeCpfTelefone} />
                 <Stack.Screen name="CadastroGuincho" component={CadastroGuincho} />
-                {/* <Stack.Screen name="CadastroDocumentos" component={CadastroDocumentos} /> */}
+                <Stack.Screen name="CadastroPrecos" component={CadastroPrecos} />
+                <Stack.Screen name="CadastroDocumentos" component={CadastroDocumentos} />
                 <Stack.Screen name="Home" component={MyTabs} />
                 <Stack.Screen name="EditProfile" component={EditProfile} />
                 <Stack.Screen name="DetalheChamado" component={DetalheChamado} />

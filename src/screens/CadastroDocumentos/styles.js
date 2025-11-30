@@ -4,11 +4,7 @@ import Constants from "expo-constants";
 const styles = StyleSheet.create({
     container:{
         flex:1,
-        justifyContent:"center",
-        alignItems:"center",
         backgroundColor:"#FFFFFF",
-        paddingTop: Constants.statusBarHeight + 10,
-
     },
     logo:{
         width:185.62,
@@ -24,7 +20,17 @@ const styles = StyleSheet.create({
     },
     texto2:{
         textAlign:"center",
-        color:"#1F284E",
+        color:"#929292",
+        fontSize:13,
+        paddingHorizontal:24,
+        paddingBottom:24,
+    },
+    scrollContainer:{
+        flexGrow:1,
+        justifyContent:"center",
+        alignItems:"center",
+        paddingTop: (Constants.statusBarHeight || 0) + 10,
+        paddingBottom: 20,
     }
 })
 

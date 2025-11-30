@@ -13,25 +13,21 @@ const styles = StyleSheet.create({
         paddingTop: (Constants.statusBarHeight || 0) + 10,
         paddingBottom: 20,
     },
-    logo:{
-        width:185.62,
-        height:42.17,
-        position:"absolute",
-        top:70
-    },
     texto:{
         fontSize:22,
+        fontWeight:"bold",
         color:"#1F284E",
-        padding:24,
+        padding:8,
         fontFamily:"Poppins-SemiBold",
         fontWeight:"bold",
     },
-    backButton: {
-        position: 'absolute',
-        top: 50,
-        left: 20,
-        zIndex: 10,
-        padding: 8,
+    texto2:{
+        textAlign:"center",
+        color:"#929292",
+        fontSize:13,
+        paddingHorizontal:24,
+        paddingBottom:24,
+        marginTop: 10,
     },
 })
 

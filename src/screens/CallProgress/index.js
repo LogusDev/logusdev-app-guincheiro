@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
-import { View, Text, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
+import Toast from 'react-native-toast-message';
 import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './styles';
@@ -17,9 +18,8 @@ import ArrivalConfirmation from '../../components/ArrivalConfirmation';
 
 const GOOGLE_MAPS_APIKEY = "AIzaSyBkx6mo29bFuoPzoNSLpE97c8EoWptHl1M";
 
-// --- Função Haversine (cálculo manual) ---
 const calcularDistancia = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Raio da Terra em km
+    const R = 6371; 
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
     const a =
@@ -27,7 +27,7 @@ const calcularDistancia = (lat1, lon1, lat2, lon2) => {
         Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distância em km
+    return R * c; 
 };
 
 export default function CallProgress({ route, navigation }) {
@@ -243,6 +243,11 @@ export default function CallProgress({ route, navigation }) {
         // navigation.navigate('Chat', { chamado, detalhe });
     };
 
+    const handleCall = () => {
+        console.log('Ligar para cliente');
+        // navigation.navigate('Call', { chamado, detalhe });
+    };
+
     const handleConfirmArrival = () => {
         if (!socketRef.current) return;
         
@@ -261,15 +266,19 @@ export default function CallProgress({ route, navigation }) {
     const handleFinalizarChamado = async () => {
         try {
             console.log("Navegando de volta para a Home...");
-            // O status já foi atualizado automaticamente pelo servidor quando ambos confirmaram
-            // Reseta a pilha de navegação para a tela 'Home'
             navigation.reset({
                 index: 0,
                 routes: [{ name: 'Home' }],
             });
         } catch (error) {
             console.error("Erro ao navegar:", error);
-            Alert.alert('Erro', 'Não foi possível navegar. Tente novamente.');
+            Toast.show({
+                type: 'error',
+                text1: 'Erro',
+                text2: 'Não foi possível navegar. Tente novamente.',
+                position: 'bottom',
+                visibilityTime: 2000,
+            });
         }
     };
 
@@ -321,7 +330,7 @@ export default function CallProgress({ route, navigation }) {
                     title="Guincheiro"
                     anchor={{ x: 0.5, y: 0.5 }}
                 >
-                    <Ionicons name="car-sport" size={35} color="#3498DB" />
+                    <Ionicons name="car-sport" size={30} color="#3498DB" />
                 </Marker>
 
                 {/* --- CORREÇÃO: Marcadores sempre visíveis --- */}
@@ -331,7 +340,7 @@ export default function CallProgress({ route, navigation }) {
                     title="Cliente"
                     description={detalhe.endereco_inicio}
                 >
-                    <IconOrigem width={35} height={35} />
+                    <IconOrigem width={30} height={30} />
                 </Marker>
 
                 {/* Marcador do Destino Final */}

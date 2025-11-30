@@ -1,11 +1,17 @@
-import { StyleSheet } from "react-native";  
+import { StyleSheet } from "react-native";
+import Constants from "expo-constants";
 
 const styles = StyleSheet.create({
     container:{
         flex:1,
+        backgroundColor:"#FFFFFF",
+    },
+    scrollContainer:{
+        flexGrow:1,
         justifyContent:"center",
         alignItems:"center",
-        backgroundColor:"#FFFFFF",
+        paddingTop: (Constants.statusBarHeight || 0) + 10,
+        paddingBottom: 20,
     },
     logo:{
         width:185.62,

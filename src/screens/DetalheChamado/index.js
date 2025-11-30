@@ -1,4 +1,5 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import Toast from 'react-native-toast-message';
 import { Image } from "expo-image";
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
@@ -102,36 +103,44 @@ export default function DetalheChamado({ route, navigation }) {
       }
       catch (error) {
         console.error('Erro ao confirmar o chamado:', error);
-        Alert.alert('Erro', 'Não foi possível aceitar o chamado. Tente novamente.');
+        Toast.show({
+          type: 'error',
+          text1: 'Erro',
+          text2: 'Não foi possível aceitar o chamado. Tente novamente.',
+          position: 'bottom',
+          visibilityTime: 2000,
+        });
       }
   }
 
   const handleCallRefuse = async () => {
-    Alert.alert(
-      'Recusar Chamado',
-      'Tem certeza que deseja recusar este chamado?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel'
-        },
-        {
-          text: 'Recusar',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await refuseCall(chamado.id, driver.id);
-              console.log('Chamado recusado');
-              navigation.goBack();
-            }
-            catch (error) {
-              console.error('Erro ao recusar o chamado:', error);
-              Alert.alert('Erro', 'Não foi possível recusar o chamado. Tente novamente.');
-            }
-          }
-        }
-      ]
-    );
+    // Para confirmação de recusa, vamos usar Toast com ação
+    // Mas como Toast não suporta múltiplos botões, vamos recusar diretamente
+    // e mostrar feedback
+    try {
+      await refuseCall(chamado.id, driver.id);
+      console.log('Chamado recusado');
+      Toast.show({
+        type: 'success',
+        text1: 'Chamado recusado',
+        text2: 'O chamado foi recusado com sucesso.',
+        position: 'top',
+        visibilityTime: 2000,
+      });
+      setTimeout(() => {
+        navigation.goBack();
+      }, 1000);
+    }
+    catch (error) {
+      console.error('Erro ao recusar o chamado:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Erro',
+        text2: 'Não foi possível recusar o chamado. Tente novamente.',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+    }
   }
 
   if (loading) {
@@ -193,7 +202,7 @@ export default function DetalheChamado({ route, navigation }) {
             origin={posicaoGuincheiro}
             destination={origem}
             apikey={GOOGLE_MAPS_APIKEY}
-            strokeWidth={4}
+            strokeWidth={4} 
             strokeColor="#3498DB"
           />
         )}

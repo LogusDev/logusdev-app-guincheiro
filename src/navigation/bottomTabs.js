@@ -17,7 +17,7 @@ export default function MyTabs(){
         elevation: 5,
         position: 'absolute',
     }}}>
-        <Tab.Screen name="Home" component={Home} options={{
+        <Tab.Screen name="MainHomeScreen" component={Home} options={{
         tabBarActiveTintColor:'#EF8108',
         tabBarInactiveTintColor:'#A5A5A5',
         tabBarIcon:({color,size})=>(

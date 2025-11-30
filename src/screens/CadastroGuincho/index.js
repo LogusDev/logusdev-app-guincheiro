@@ -5,10 +5,11 @@ import {
   Text,
   StatusBar,
   Image,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform,
+  TouchableOpacity,
 } from "react-native";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Ionicons } from '@expo/vector-icons';
+import Toast from 'react-native-toast-message';
 import TextInputComponent from "../../components/TextInput";
 import Button from "../../components/Button";
 import styles from "../CadastroGuincho/styles";
@@ -90,35 +91,69 @@ export default function CadastroGuincho({ navigation, route }) {
 
   function handleSignIn() {
     if (!marcaSelecionada || !modeloSelecionado || !anoSelecionado) {
-      alert("Preencha todos os campos obrigatórios!");
+      Toast.show({
+        type: 'error',
+        text1: 'Atenção',
+        text2: 'Preencha todos os campos obrigatórios!',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
       return;
     }
 
-    navigation.navigate("Home", {email,password,name,cpf: unmaskedCpf,phone: unmaskedPhone,cnh_num,anoSelecionado,modeloSelecionado,marcaSelecionada,});
+    // Validar capacidade e comprimento da plataforma
+    if (!capacidadeValue || capacidadeValue.trim() === '') {
+      Toast.show({
+        type: 'error',
+        text1: 'Atenção',
+        text2: 'Preencha a capacidade do guincho!',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+      return;
+    }
 
-    console.log({
-        email,
-        password,
-        name,
-        unmaskedCpf,
-        unmaskedPhone,
-        cnh_num,
-        marcaSelecionada,
-        modeloSelecionado,
-        anoSelecionado,
-        capacidade: capacidadeValue,
-        comprimentoPlataforma
+    if (!comprimentoPlataforma || comprimentoPlataforma.trim() === '') {
+      Toast.show({
+        type: 'error',
+        text1: 'Atenção',
+        text2: 'Preencha o comprimento da plataforma!',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
+    // Remover "kg" e "m" dos valores antes de passar
+    const capacidadeLimpa = capacidadeValue.replace(/[^0-9.]/g, '');
+    const comprimentoLimpo = comprimentoPlataforma.replace(/[^0-9.]/g, '').replace(/\s*m\s*/g, '');
+
+    navigation.navigate("CadastroPrecos", {
+      email,
+      password,
+      name,
+      cpf: unmaskedCpf,
+      phone: unmaskedPhone,
+      cnh_num,
+      anoSelecionado,
+      modeloSelecionado,
+      marcaSelecionada,
+      capacidade: capacidadeLimpa,
+      comprimentoPlataforma: comprimentoLimpo,
+      placa: ""
     });
-
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#FFFFFF" }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
-        <StatusBar barStyle="light-content" />
+    <View style={styles.container}>
+      <StatusBar barStyle={'light-content'} />
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        enableOnAndroid={true}
+        extraScrollHeight={20}
+      >
         <Logo />
         <Image style={{ height: 270, width: 270 }} source={require("../../assets/images/register.png")} />
         <Text style={styles.texto}>Dados do veículo</Text>
@@ -150,6 +185,7 @@ export default function CadastroGuincho({ navigation, route }) {
         <TextInputComponent
             placeholder="Capacidade (Kg)"
             placeholderTextColor="#999999"
+            name="scale-outline"
             value={capacidadeValue ? `${capacidadeValue} kg` : ''}
             onChangeText={(text) => {
             const numeric = text.replace(/[^0-9.]/g,'');
@@ -175,8 +211,8 @@ export default function CadastroGuincho({ navigation, route }) {
         />
 
 
-        <Button style={{ marginTop: 12 }} text={"Próximo"} onPress={handleSignIn} />
-      </ScrollView>
-    </KeyboardAvoidingView>
+        <Button style={{marginTop: 12, marginBottom: 30}} text={"Próximo"} onPress={handleSignIn} />
+      </KeyboardAwareScrollView>
+    </View>
   );
 }
