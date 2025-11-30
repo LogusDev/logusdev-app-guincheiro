@@ -8,6 +8,8 @@ import { DriverProvider } from "../contexts/DriverContext";
 import Home from "../screens/Home";
 import DetalheChamado from "../screens/DetalheChamado";
 import CallProgress from "../screens/CallProgress";
+import ActivityScreen from "../screens/ActivityScreen";
+import ReceiptScreen from "../screens/ReceiptScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +22,8 @@ export default function Navigation() {
                 <Stack.Screen name="Home" component={MyTabs} />
                 <Stack.Screen name="DetalheChamado" component={DetalheChamado} />
                 <Stack.Screen name="CallProgress" component={CallProgress} />
+                <Stack.Screen name="ActivityScreen" component={ActivityScreen} />
+                <Stack.Screen name="ReceiptScreen" component={ReceiptScreen} />
             </Stack.Navigator>
         </NavigationContainer>
         </DriverProvider>

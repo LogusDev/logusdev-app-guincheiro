@@ -16,6 +16,23 @@ export const getCallsWaiting = async (latitude, longitude) => {
 };
 
 
+export const getDriverCalls = async (id, token) => {
+  try {
+    const response = await api.get(`/chamados/guincheiro/meus/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Erro ao buscar chamados do guincheiro:", error);
+    throw error.response ? error.response.data : "Erro ao conectar com o servidor";
+  }
+};
+
+
+
 
 export const getCallDetails = async (callId) => {
     try {

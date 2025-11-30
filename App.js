@@ -1,7 +1,7 @@
 import StackNavigator from './src/navigation/stack';
 import { useFonts } from 'expo-font';
 import Toast from 'react-native-toast-message';
-
+import { DriverProvider } from './src/contexts/DriverContext';
 
 export default function App(){
   const [fontsLoaded] = useFonts({
@@ -14,11 +14,15 @@ export default function App(){
   if(!fontsLoaded){
     return null;
   }
-  
-  return(
+
+  return (
     <>
-      <StackNavigator/>
+      <DriverProvider>
+        <StackNavigator/>
+      </DriverProvider>
       <Toast/>
     </>
-  )
+  );
 }
+
+//Arruar
