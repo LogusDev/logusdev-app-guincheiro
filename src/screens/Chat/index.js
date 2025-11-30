@@ -4,10 +4,9 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -133,11 +132,7 @@ export default function Chat({ route, navigation }) {
   const clienteFoto = detalhe?.cliente?.foto_url || chamado?.cliente_foto_url;
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-    >
+    <View style={styles.container}>
       <StatusBar backgroundColor="#FFFFFF" barStyle="dark-content" />
       
       {/* Header */}
@@ -160,13 +155,19 @@ export default function Chat({ route, navigation }) {
         </View>
       </View>
 
-      {/* Messages */}
-      <ScrollView
-        ref={scrollViewRef}
+      {/* Messages e Input dentro do KeyboardAwareScrollView */}
+      <KeyboardAwareScrollView
         style={styles.messagesContainer}
         contentContainerStyle={styles.messagesContent}
+        innerRef={ref => {
+          scrollViewRef.current = ref;
+        }}
         onContentSizeChange={scrollToBottom}
         keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        enableAutomaticScroll={true}
+        extraScrollHeight={Platform.OS === 'android' ? 90 : 90}
+        showsVerticalScrollIndicator={false}
       >
         {groupedMessages.map((item, index) => {
           if (item.type === 'date') {
@@ -194,33 +195,33 @@ export default function Chat({ route, navigation }) {
             </View>
           );
         })}
-      </ScrollView>
 
-      {/* Input - Fixo na parte inferior */}
-      <View style={styles.inputContainer}>
-        <TouchableOpacity style={styles.emojiButton}>
-          <Ionicons name="happy-outline" size={24} color="#1F284E" />
-        </TouchableOpacity>
-        
-        <TextInput
-          style={styles.input}
-          placeholder="Digite uma mensagem..."
-          placeholderTextColor="#999"
-          value={messageText}
-          onChangeText={setMessageText}
-          multiline
-          maxLength={500}
-        />
-        
-        <TouchableOpacity
-          style={[styles.sendButton, !messageText.trim() && styles.sendButtonDisabled]}
-          onPress={sendMessage}
-          disabled={!messageText.trim()}
-        >
-          <Ionicons name="send" size={20} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+        {/* Input dentro do scroll */}
+        <View style={styles.inputContainer}>
+          <TouchableOpacity style={styles.emojiButton}>
+            <Ionicons name="happy-outline" size={24} color="#1F284E" />
+          </TouchableOpacity>
+          
+          <TextInput
+            style={styles.input}
+            placeholder="Digite uma mensagem..."
+            placeholderTextColor="#999"
+            value={messageText}
+            onChangeText={setMessageText}
+            multiline
+            maxLength={500}
+          />
+          
+          <TouchableOpacity
+            style={[styles.sendButton, !messageText.trim() && styles.sendButtonDisabled]}
+            onPress={sendMessage}
+            disabled={!messageText.trim()}
+          >
+            <Ionicons name="send" size={20} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAwareScrollView>
+    </View>
   );
 }
 
