@@ -10,31 +10,32 @@ export default function ActivityScreen({ driverId }) {
 
   const { driver, token } = useContext(DriverContext);
 
-  
   useEffect(() => {
-    async function fetchActivities() {
-      try {
-        setLoading(true);
+  async function fetchActivities() {
+    try {
+      setLoading(true);
 
-        // await updateExistingAddresses(token);
-        // console.log("Atualizou endereços, agora vai buscar os chamados...")
-        console.log("Driver:", driver);
-        console.log("Token:", token);
+      console.log("Driver:", driver);
+      console.log("Token:", token);
 
-        const data = await getDriverCalls(driver.id, token);
-        setActivities(data);
-      } catch (error) {
-        console.log("Erro ao buscar atividades:", error);
-      } finally {
-        setLoading(false);
-        console.log("Finalizou carregamento");
-      }
+      const data = await getDriverCalls(driver.id, token);
+
+      // Filtra apenas os chamados concluídos
+      const concluídos = data.filter((activity) => activity.status_chamado === "concluido");
+
+      setActivities(concluídos);
+    } catch (error) {
+      console.log("Erro ao buscar atividades:", error);
+    } finally {
+      setLoading(false);
+      console.log("Finalizou carregamento");
     }
-    
-    if (driver && token) {
-      fetchActivities();
-    }
-  }, [driver, token]);
+  }
+
+  if (driver && token) {
+    fetchActivities();
+  }
+}, [driver, token]);
 
 
   const groupedByDate = activities.length
@@ -68,6 +69,7 @@ export default function ActivityScreen({ driverId }) {
             {groupedByDate[date].map((activity) => (
               <ActivityCard
                 key={activity.id}
+                activity={activity}
                 id={activity.id}
                 user={activity.cliente?.nome || "Nome não encontrado"}
                 avatar={activity.cliente?.foto_url || "https://cdn-icons-png.flaticon.com/512/12225/12225881.png"}

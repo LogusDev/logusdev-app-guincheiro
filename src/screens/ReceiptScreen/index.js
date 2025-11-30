@@ -1,8 +1,7 @@
+import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ReceiptButton from "../../components/ReceiptButton/ReceiptButton";
-import { useState, useEffect, useRef } from "react";
-import { CallSearch } from "../../services/calls";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
@@ -11,31 +10,29 @@ import { Asset } from "expo-asset";
 
 export default function ReceiptScreen({ route }) {
   const { receiptData } = route.params || {};
-  const id = receiptData?.id;
 
-  const [driverData, setDriverData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [hideButton, setHideButton] = useState(false);
-
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
   const [serrilhadoUri, setSerrilhadoUri] = useState(null);
   const [logoUri, setLogoUri] = useState(null);
   const [mapUri, setMapUri] = useState(null);
   const [driverPlaceholderUri, setDriverPlaceholderUri] = useState(null);
 
-  const receiptRef = useRef();
   const offscreenRef = useRef();
-
   const { width, height } = Dimensions.get("screen");
 
-  useEffect(() => {
-    async function fetchCallDetails() {
-      const data = await CallSearch(id);
-      if (data) setDriverData(data);
-      setLoading(false);
-    }
-    fetchCallDetails();
-  }, [id]);
+  // Formata horários e datas
+  const startTime = receiptData?.requisitado_em
+    ? new Date(receiptData.requisitado_em).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+    : "--:--";
+  const endTime = receiptData?.completado_em
+    ? new Date(receiptData.completado_em).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+    : "--:--";
+  const date = receiptData?.requisitado_em
+    ? new Date(receiptData.requisitado_em).toLocaleDateString("pt-BR")
+    : "--/--/----";
 
+  // Assets
   useEffect(() => {
     async function loadAssets() {
       const serrilhadoAsset = require("../../assets/images/serrilhado.png");
@@ -45,52 +42,56 @@ export default function ReceiptScreen({ route }) {
 
       const loaded = await Asset.loadAsync([serrilhadoAsset, logoAsset, mapAsset, driverAsset]);
 
-      const serr = loaded[0].localUri || loaded[0].uri;
-      const log = loaded[1].localUri || loaded[1].uri;
-      const mp = loaded[2].localUri || loaded[2].uri;
-      const drv = loaded[3].localUri || loaded[3].uri;
-
-      setSerrilhadoUri(serr);
-      setLogoUri(log);
-      setMapUri(mp);
-      setDriverPlaceholderUri(drv);
+      setSerrilhadoUri(loaded[0].localUri || loaded[0].uri);
+      setLogoUri(loaded[1].localUri || loaded[1].uri);
+      setMapUri(loaded[2].localUri || loaded[2].uri);
+      setDriverPlaceholderUri(loaded[3].localUri || loaded[3].uri);
+      setAssetsLoaded(true);
     }
 
     loadAssets();
   }, []);
 
+  const renderPaymentMethod = (method) => {
+    if (!method) return { iconName: "card-outline", label: "CARTÃO" };
+
+    const lower = method.toLowerCase();
+    let iconName = "card-outline";
+    let label = "";
+
+    switch (lower) {
+      case "dinheiro":
+        iconName = "cash-outline";
+        label = "DINHEIRO";
+        break;
+      case "pix":
+        iconName = "logo-bitcoin";
+        label = "PIX";
+        break;
+      case "cartão":
+      case "cartao":
+        iconName = "card-outline";
+        label = "CARTÃO";
+        break;
+      default:
+        iconName = "card-outline";
+        label = method.toUpperCase();
+    }
+
+    return { iconName, label };
+  };
+
   const handleGeneratePDF = async () => {
     try {
       setHideButton(true);
-
-      const base64 = await captureRef(offscreenRef, {
-        format: "png",
-        quality: 1,
-        result: "base64",
-      });
-
+      const base64 = await captureRef(offscreenRef, { format: "png", quality: 1, result: "base64" });
       const htmlContent = `
         <html>
           <head>
             <style>
-                @page { 
-                margin: 10px;
-                size: A4 portrait; 
-              }
-
-              body {
-                margin: 0;
-                padding: 0;
-                display: flex;
-                justify-content: center;
-                background: #fff;
-              }
-
-              img {
-                width: 90%;
-                max-height: 120%;
-                object-fit: contain; 
-              }
+              @page { margin: 10px; size: A4 portrait; }
+              body { margin: 0; padding: 0; display: flex; justify-content: center; background: #fff; }
+              img { width: 90%; max-height: 120%; object-fit: contain; }
             </style>
           </head>
           <body>
@@ -98,12 +99,8 @@ export default function ReceiptScreen({ route }) {
           </body>
         </html>
       `;
-
-
       const { uri: pdfUri } = await Print.printToFileAsync({ html: htmlContent });
-
       const pdfPath = FileSystem.documentDirectory + "recibo.pdf";
-
       await FileSystem.moveAsync({ from: pdfUri, to: pdfPath });
       await Sharing.shareAsync(pdfPath);
     } catch (error) {
@@ -119,196 +116,160 @@ export default function ReceiptScreen({ route }) {
       const uri = await captureRef(offscreenRef, { format: "png", quality: 1 });
       await Sharing.shareAsync(uri);
     } catch (error) {
-      console.log("Erro ao compartilhar recibo", error);
+      console.log("Erro ao compartilhar recibo:", error);
     } finally {
       setHideButton(false);
     }
   };
 
-  const renderPaymentMethod = (method) => {
-  if (!method) return { icon: "card-outline", label: "CARTÃO" };
-
-  const lower = method.toLowerCase();
-  let iconName = "card-outline";
-  let label = "";
-
-  switch (lower) {
-    case "dinheiro":
-      iconName = "cash-outline";
-      label = "DINHEIRO";
-      break;
-    case "pix":
-      iconName = "logo-bitcoin"; 
-      label = "PIX";
-      break;
-    case "cartao":
-      iconName = "card-outline";
-      label = "CARTÃO";
-      break;
-    default:
-      iconName = "card-outline";
-      label = method.toUpperCase();
-  }
-
-  return { iconName, label };
-};
+  const paymentInfo = renderPaymentMethod(receiptData?.metodo_pagamento);
 
   return (
-    <>
-      <View style={{ backgroundColor: "#F5F5F5" }}>
-        <View style={styles.receiptHeader}>
-          <Image source={require("../../assets/images/serrilhado.png")} style={styles.serrilhado} />
-          {!hideButton && <ReceiptButton onPDFPress={handleGeneratePDF} onSharePress={handleShareScreenshot} />}
+    <ScrollView style={{ backgroundColor: "#F5F5F5" }}>
+      {/* Botões de PDF e Share */}
+      <View style={styles.receiptHeader}>
+        {serrilhadoUri && <Image source={{ uri: serrilhadoUri }} style={styles.serrilhado} />}
+        {!hideButton && <ReceiptButton onPDFPress={handleGeneratePDF} onSharePress={handleShareScreenshot} />}
+      </View>
+
+      {/* Logo */}
+      <View style={styles.header}>{logoUri && <Image source={{ uri: logoUri }} style={styles.logo} />}</View>
+
+      {/* Guincheiro */}
+      <View style={styles.profileBox}>
+        <Image
+          source={
+            receiptData?.guincheiro?.foto_url
+              ? { uri: receiptData.guincheiro.foto_url }
+              : driverPlaceholderUri
+              ? { uri: driverPlaceholderUri }
+              : null
+          }
+          style={styles.avatar}
+        />
+        <View style={styles.profileInfo}>
+          <Text style={styles.userName}>{receiptData?.cliente?.nome || "Cliente"}</Text>
+          <Text style={styles.date}>{date}</Text>
+          <Text style={styles.time}>
+            {startTime} <Ionicons name="timer-outline" size={14} color="#1F284E" /> {endTime}
+          </Text>
         </View>
-        <View style={styles.header}>
-          <Image source={require("../../assets/images/logoguinchAqui.png")} style={styles.logo} />
-        </View>
-        <View style={styles.profileBox}>
-          <Image
-            source={receiptData?.avatar ? { uri: receiptData.avatar } : require("../../assets/images/userImage.png")}
-            style={styles.avatar}
-          />
-          <View style={styles.profileInfo}>
-            <Text style={styles.userName} numberOfLines={1}>{receiptData?.user}</Text>
-            <Text style={styles.date}>{receiptData?.date || "23/04/2025"}</Text>
-            <Text style={styles.time}>
-              {receiptData?.startTime || "23:47"} <Ionicons name="timer-outline" size={14} color="#1F284E" />{" "}
-              {receiptData?.endTime || "00:15"}
+      </View>
+
+      {/* Mapa */}
+      {mapUri && <Image source={{ uri: mapUri }} style={styles.map} />}
+
+      {/* Veículo */}
+      <View style={styles.vehicleBox}>
+        <Text style={styles.vehicleName}>{(receiptData.veiculo?.modelo).split(" ").slice(0, 2).join(" ")}</Text>
+        <Text style={styles.vehicleDetails}>{receiptData.veiculo?.marca}</Text>
+        <Text style={styles.vehicleDetails}>
+          {receiptData.veiculo?.ano_fabricacao}
+        </Text>
+
+        <View style={styles.paymentBox}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons name={paymentInfo.iconName} size={40} top={"-40%"} left={"80%"} color="#1F284E" />
+              <Text style={[styles.paymentMethod, { marginLeft: 10 }]}>{paymentInfo.label}</Text>
+            </View>
+            <Text style={styles.price}>
+              R$: <Text style={styles.priceValue}>{receiptData.preco}</Text>
             </Text>
           </View>
+                </View>
         </View>
 
-        <Image source={require("../../assets/images/mapImage.png")} style={styles.map} />
+      {/* Endereços */}
+      <View style={styles.addressContainer}>
+        <View style={styles.addressBox}>
+          <View style={styles.startAddressBox}>
+            <Text style={styles.cityText}>{receiptData.endereco_inicial}</Text>
+          </View>
+          <Ionicons name="arrow-forward-circle-outline" size={35} color="#1F284E" />
+          <View style={styles.endAddressBox}>
+            <Text style={styles.cityText}>{receiptData.endereco_final}</Text>
+          </View>
+        </View>
+      </View>
 
-        {!loading && driverData ? (
-          <View style={styles.vehicleBox}>
-            <Text style={styles.vehicleName}>{driverData.guincho?.modelo || "Atego 1726 – Branco"}</Text>
-            <Text style={styles.vehicleDetails}>{driverData.guincho?.marca || "Mercedes-Benz"}</Text>
-            <Text style={styles.vehicleDetails}>
-              {driverData.guincho?.ano_fabricacao || "2010"} {" "}
-              {!driverData.guincho?.comprimento_plataforma ? (
-              driverData.guincho?.comprimento_plataforma || ""
-              ) : ""}
-            </Text>
-            <View style={styles.paymentBox}>
-            {(() => {
-              const { iconName, label } = renderPaymentMethod(driverData?.metodo_pagamento);
-              return (
-                <>
-                  <Ionicons name={iconName} size={40} top={20} left={30} color="#1F284E" />
-                  <Text style={styles.paymentMethod}>{label}</Text>
-                  <Text style={styles.price}>
-                    R$: <Text style={styles.priceValue}>{driverData?.preco || "247,42"}</Text>
-                  </Text>
-                </>
-              );
-            })()}
-          </View>
-          </View>
-        ) : (
-          <View style={{ alignItems: "center", marginTop: 20 }}>
-            <ActivityIndicator size="small" color="#1F284E" />
-            <Text style={{ color: "#1F284E", marginTop: 5 }}>Carregando dados do guincho...</Text>
+      {/* Offscreen para gerar PDF */}
+      <View
+        ref={offscreenRef}
+        collapsable={false}
+        style={{ position: "absolute", top: -10000, left: -10000, width: width, backgroundColor: "#F5F5F5", paddingBottom: 20 }}
+      >
+        {/* Cabeçalho com serrilhado */}
+        {serrilhadoUri && <Image source={{ uri: serrilhadoUri }} style={styles.serrilhado} />}
+        {logoUri && (
+          <View style={[styles.header, { marginBottom: 15 }]}>
+            <Image source={{ uri: logoUri }} style={styles.logo} />
           </View>
         )}
 
+        {/* Guincheiro / Cliente */}
+        <View style={styles.profileBox}>
+          <Image
+            source={
+              receiptData?.guincheiro?.foto_url
+                ? { uri: receiptData.guincheiro.foto_url }
+                : driverPlaceholderUri
+                ? { uri: driverPlaceholderUri }
+                : null
+            }
+            style={styles.avatar}
+          />
+          <View style={styles.profileInfo}>
+            <Text style={styles.userName}>{receiptData?.cliente?.nome || "Cliente"}</Text>
+            <Text style={styles.date}>{date}</Text>
+            <Text style={styles.time}>
+              {startTime} <Ionicons name="timer-outline" size={14} color="#1F284E" /> {endTime}
+            </Text>
+          </View>
+        </View>
+
+        {/* Mapa */}
+        {mapUri && <Image source={{ uri: mapUri }} style={styles.map} />}
+
+       {/* Veículo e pagamento */}
+        <View style={[styles.vehicleBox, { paddingVertical: 10 }]}>
+          <Text style={styles.vehicleName}>
+            {(receiptData.veiculo?.modelo || "").split(" ").slice(0, 2).join(" ")}
+          </Text>
+          <Text style={styles.vehicleDetails}>{receiptData.veiculo?.marca}</Text>
+          <Text style={styles.vehicleDetails}>{receiptData.veiculo?.ano_fabricacao}</Text>
+
+          {/* Caixa de pagamento e preço */}
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+            {/* Método de pagamento */}
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons name={paymentInfo.iconName} size={40} color="#1F284E" />
+              <Text style={{ marginLeft: 10, fontSize: 17, fontWeight: "600", color: "#1F284E" }}>
+                {paymentInfo.label}
+              </Text>
+            </View>
+
+            {/* Preço */}
+            <Text style={{ fontSize: 21, fontWeight: "bold", color: "#1F284E" }}>
+              R$: <Text style={{ color: "green" }}>{receiptData.preco}</Text>
+            </Text>
+          </View>
+        </View>
+
+        {/* Endereços */}
         <View style={styles.addressContainer}>
           <View style={styles.addressBox}>
             <View style={styles.startAddressBox}>
-              <Text style={styles.cityText}>{receiptData?.startAddress}</Text>
+              <Text style={styles.cityText}>{receiptData.endereco_inicial}</Text>
             </View>
             <Ionicons name="arrow-forward-circle-outline" size={35} color="#1F284E" />
             <View style={styles.endAddressBox}>
-              <Text style={styles.cityText}>{receiptData?.endAddress}</Text>
+              <Text style={styles.cityText}>{receiptData.endereco_final}</Text>
             </View>
           </View>
         </View>
       </View>
-
-      <View
-  ref={offscreenRef}
-  collapsable={false}
-  style={{
-    position: "absolute",
-    top: -10000,
-    left: -10000,
-    width: width,
-    height: height,
-    backgroundColor: "#F5F5F5",
-  }}
->
-  <View style={styles.receiptHeader}>
-    {serrilhadoUri && <Image source={{ uri: serrilhadoUri }} style={styles.serrilhado} />}
-  </View>
-
-  <View style={styles.header}>
-    {logoUri && <Image source={{ uri: logoUri }} style={styles.logo} />}
-  </View>
-
-  <View style={styles.profileBox}>
-    <Image
-      source={
-        receiptData?.avatar
-          ? { uri: receiptData.avatar }
-          : driverPlaceholderUri
-          ? { uri: driverPlaceholderUri }
-          : null
-      }
-      style={styles.avatar}
-    />
-    <View style={styles.profileInfo}>
-      <Text style={styles.userName}>{receiptData?.user}</Text>
-      <Text style={styles.date}>{receiptData?.date || "23/04/2025"}</Text>
-      <Text style={styles.time}>
-        {receiptData?.startTime || "23:47"}{" "}
-        <Ionicons name="timer-outline" size={14} color="#1F284E" />{" "}
-        {receiptData?.endTime || "00:15"}
-      </Text>
-    </View>
-  </View>
-
-  {mapUri && <Image source={{ uri: mapUri }} style={styles.map} />}
-
-  {!loading && driverData && (
-    <View style={styles.vehicleBox}>
-      <Text style={styles.vehicleName}>{driverData.guincho?.modelo || "Atego 1726 – Branco"}</Text>
-      <Text style={styles.vehicleDetails}>{driverData.guincho?.marca || "Mercedes-Benz"}</Text>
-      <Text style={styles.vehicleDetails}>
-        {driverData.guincho?.ano_fabricacao || "2010"} - {driverData.guincho?.comprimento_plataforma || "ABC-1234"}m
-      </Text>
-
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Ionicons
-            name={renderPaymentMethod(driverData?.metodo_pagamento).iconName}
-            size={40}
-            color="#1F284E"
-          />
-          <Text style={[styles.paymentMethod, { marginLeft: 10 }]}>
-            {renderPaymentMethod(driverData?.metodo_pagamento).label}
-          </Text>
-        </View>
-        <Text style={styles.price}>
-          R$: <Text style={styles.priceValue}>{driverData?.preco || "247,42"}</Text>
-        </Text>
-      </View>
-    </View>
-  )}
-
-  <View style={styles.addressContainer}>
-    <View style={styles.addressBox}>
-      <View style={styles.startAddressBox}>
-        <Text style={styles.cityText}>{receiptData?.startAddress}</Text>
-      </View>
-      <Ionicons name="arrow-forward-circle-outline" size={35} color="#1F284E" />
-      <View style={styles.endAddressBox}>
-        <Text style={styles.cityText}>{receiptData?.endAddress}</Text>
-      </View>
-    </View>
-  </View>
-</View>
-
-      </>
+    </ScrollView>
   );
 }
 
@@ -416,15 +377,15 @@ const styles = StyleSheet.create({
 
   paymentBox: {
     top: "-56%",
-    left: "10%",
+    left: "21%",
     justifyContent: "space-between",
     alignItems: "center",
     paddingTop: 8,
   },
 
   paymentMethod: {
-    top: "-16%",
-    left: "24%",
+    top: "-45%",
+    left: "75%",
     flexDirection: "row",
     alignItems: "center",
     fontSize: 17,
@@ -433,8 +394,8 @@ const styles = StyleSheet.create({
   },
 
   price: {
-    left: "20%",
-    top: "-2%",
+    left: "-7%",
+    top: "60%",
     fontSize: 21,
     fontWeight: "bold",
     color: "#1F284E",
@@ -445,7 +406,7 @@ const styles = StyleSheet.create({
   },
 
   addressContainer: {
-    top: "-14%",
+    marginTop: -70,
     width: "85%",
     alignSelf: "center",
     backgroundColor: "#fff",
