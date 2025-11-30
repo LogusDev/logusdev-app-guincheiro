@@ -1,20 +1,18 @@
-import { View, Text, TouchableOpacity, Animated, ScrollView } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TouchableOpacity, Animated, ScrollView, Modal, StatusBar } from 'react-native';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import { styles } from './styles';
 import { getCurrentPositionAsync, LocationAccuracy, requestForegroundPermissionsAsync, watchPositionAsync } from "expo-location";
-import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker } from 'react-native-maps';
 import PhotoCard from '../../components/PhotoCard';
 import LoadingScreen from '../../components/LoadingScreen';
 import { Image } from 'expo-image';
-import { Ionicons } from '@react-native-vector-icons/ionicons';
-import { Video } from 'expo-av';
-import SearchingVideo from '../../assets/images/searching.gif';
+import { Ionicons } from '@expo/vector-icons';
 import { getCallsWaiting } from '../../services/calls';
-import { lightMapStyle } from '../../utils/mapStyle';
+import { DriverContext } from '../../contexts/DriverContext';
 
 export default function Home({navigation}){
 
+    const { driver } = useContext(DriverContext);
     const [location, setLocation] = useState(null);
     const [permissionDenied, setPermissionDenied] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -46,9 +44,21 @@ export default function Home({navigation}){
 
     const fetchCalls = async () => {
         try {
+            if (!driver?.id) {
+                console.log("Guincheiro não logado");
+                setChamados([]);
+                return;
+            }
+
+            if (!location || !location.latitude || !location.longitude) {
+                console.log("Localização não disponível");
+                setChamados([]);
+                return;
+            }
+
             const { latitude, longitude } = location;
 
-            const data = await getCallsWaiting(latitude, longitude);
+            const data = await getCallsWaiting(latitude, longitude, driver.id);
 
             if (Array.isArray(data)) {
                 setChamados(data);
@@ -135,9 +145,15 @@ export default function Home({navigation}){
 
     if (isLoading) {
         return (
-            <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
-                <LoadingScreen />
-            </Animated.View>
+            <Modal
+                visible={true}
+                transparent={false}
+                animationType="fade"
+            >
+                <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+                    <LoadingScreen />
+                </Animated.View>
+            </Modal>
         );
     }
 
@@ -150,7 +166,7 @@ export default function Home({navigation}){
                         Permissão de localização negada. Habilite-a nas configurações do dispositivo para usar o mapa.
                     </Text>
                 </View>
-            ) : (
+            ) : location ? (
                 <>
                     <MapView
                         region={{
@@ -159,7 +175,8 @@ export default function Home({navigation}){
                             latitudeDelta: 0.005,
                             longitudeDelta: 0.005,
                         }}
-                        mapType="standard"                         showsBuildings={true}
+                        mapType="standard"
+                        showsBuildings={true}
                         style={styles.map}
                         showsMyLocationButton={true}
                         provider="google"
@@ -232,7 +249,7 @@ export default function Home({navigation}){
                         </ScrollView>
                     )}
                 </>
-            )}
+            ) : null}
         </View>
     )
 }

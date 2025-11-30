@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import Toast from 'react-native-toast-message';
 import { Image } from "expo-image";
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
@@ -8,13 +9,12 @@ import * as Location from "expo-location";
 import { LocationAccuracy } from "expo-location";
 import styles from "./styles";
 import IconOrigem from "../../components/IconOrigem";
-import { getCallDetails, confirmCall } from "../../services/calls";
+import { getCallDetails, confirmCall, refuseCall } from "../../services/calls";
 import Hatch from "../../assets/images/carhatch.svg";
 import { StatusBar } from "expo-status-bar";
 import { DriverContext } from "../../contexts/DriverContext";
-import Button from "../../components/Button";
 
-const GOOGLE_MAPS_APIKEY = "AIzaSyBS5TYszHyw5VyTUU9gUCWYdNqOQ5pt7ik";
+const GOOGLE_MAPS_APIKEY = "AIzaSyBkx6mo29bFuoPzoNSLpE97c8EoWptHl1M";
 
 export default function DetalheChamado({ route, navigation }) {
   const { chamado } = route.params;
@@ -102,7 +102,44 @@ export default function DetalheChamado({ route, navigation }) {
       }
       catch (error) {
         console.error('Erro ao confirmar o chamado:', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Erro',
+          text2: 'Não foi possível aceitar o chamado. Tente novamente.',
+          position: 'bottom',
+          visibilityTime: 2000,
+        });
       }
+  }
+
+  const handleCallRefuse = async () => {
+    // Para confirmação de recusa, vamos usar Toast com ação
+    // Mas como Toast não suporta múltiplos botões, vamos recusar diretamente
+    // e mostrar feedback
+    try {
+      await refuseCall(chamado.id, driver.id);
+      console.log('Chamado recusado');
+      Toast.show({
+        type: 'success',
+        text1: 'Chamado recusado',
+        text2: 'O chamado foi recusado com sucesso.',
+        position: 'top',
+        visibilityTime: 2000,
+      });
+      setTimeout(() => {
+        navigation.goBack();
+      }, 1000);
+    }
+    catch (error) {
+      console.error('Erro ao recusar o chamado:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Erro',
+        text2: 'Não foi possível recusar o chamado. Tente novamente.',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+    }
   }
 
   if (loading) {
@@ -164,7 +201,7 @@ export default function DetalheChamado({ route, navigation }) {
             origin={posicaoGuincheiro}
             destination={origem}
             apikey={GOOGLE_MAPS_APIKEY}
-            strokeWidth={4}
+            strokeWidth={4} 
             strokeColor="#3498DB"
           />
         )}
@@ -275,16 +312,20 @@ export default function DetalheChamado({ route, navigation }) {
               {detalhe.metodo_pagamento?.toUpperCase() || "CARTÃO"}
             </Text>
           </View>
-          <View style={{aligntext:'center',alignItems:'center'}}>
-            <Button
-            text="Confirmar"
-            onPress={handleCallConfirm}
-
-            />
+          <View style={{flexDirection: 'row', gap: 10, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20, marginTop: 20}}>
+            <TouchableOpacity
+              style={[styles.refuseButton, { flex: 1 }]}
+              onPress={handleCallRefuse}
+            >
+              <Text style={styles.refuseButtonText}>Recusar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.confirmButton, { flex: 1, marginTop: 0 }]}
+              onPress={handleCallConfirm}
+            >
+              <Text style={styles.confirmText}>Confirmar</Text>
+            </TouchableOpacity>
           </View>
-          {/* <TouchableOpacity style={styles.confirmButton}>
-            <Text style={styles.confirmText}>Confirmar</Text>
-          </TouchableOpacity> */}
         </View>
       </View>
     </View>
