@@ -72,3 +72,14 @@ export const criarValoresGuincho = async (valoresData) => {
         throw error.response ? error.response.data : 'Erro ao conectar com o servidor';
     }
 };
+
+export const selecionarGuincho = async (guinchoId, token) => {
+    try {
+        const response = await api.put(`/guinchos/${guinchoId}/selecionar`, {}, {
+            headers: { 'x-access-token': token }
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response ? error.response.data : 'Erro ao selecionar guincho';
+    }
+};

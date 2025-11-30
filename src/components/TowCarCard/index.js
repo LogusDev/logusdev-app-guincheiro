@@ -14,7 +14,7 @@ export default function TowCarCard({ guincho, active, onSelect, onEdit }) {
 
   return (
     <TouchableOpacity
-      style={[styles.cardContainer, active && { borderColor: '#EF8108' }]}
+      style={[styles.cardContainer, active && { borderColor: '#1F284E' }]}
       onPress={onSelect}
       activeOpacity={0.8}
     >
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -12,
     right: 12,
-    backgroundColor: "#EF8108",
+    backgroundColor: "#1F284E",
     paddingHorizontal: 14,
     paddingVertical: 4,
     borderRadius: 12,

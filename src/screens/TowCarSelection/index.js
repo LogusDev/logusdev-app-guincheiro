@@ -61,25 +61,27 @@ export default function TowCarSelection() {
 
 
   const handleSelectedTowCar = async (vehicleId) => {
-    try {
-      await api.put(`/guinchos/${vehicleId}`, {
-        guincheiro_id: driver.id
-      });
+  try {
+    await api.put(
+      `/guinchos/${vehicleId}/selecionar`,
+      {}, 
+      { headers: { 'x-access-token': driver.token } }
+    );
 
-      setselectedTowCar(vehicleId);
-      console.log("Carro selecionado:", vehicleId);
-      fetchTowCars();
+    setselectedTowCar(vehicleId);
+    fetchTowCars();
 
-    } catch (error) {
-      console.log("Erro ao selecionar veículo", error);
-    }
-    
-  };
+  } catch (error) {
+    console.log("Erro ao selecionar veículo", error);
+    Alert.alert("Erro", "Não foi possível selecionar o veículo.");
+  }
+};
 
-  const handleEditTowCar = (vehicle) => {
-    settowcarEdit(vehicle);
-    setTowCarEditModalVisible(true);
-  };
+const handleEditTowCar = (vehicle) => {
+  settowcarEdit(vehicle);
+  setTowCarEditModalVisible(true);
+};
+
 
   return (
     <View style={styles.container}>
