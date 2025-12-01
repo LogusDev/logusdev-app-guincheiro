@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, ScrollView, Alert } from "react-native";
+import { View, Text, StatusBar, ScrollView, Alert, ActivityIndicator } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import TowCarCard from "../../components/TowCarCard";
 import styles from "./styles";
@@ -16,10 +16,12 @@ export default function TowCarSelection() {
   const [isTowCarEditModalVisible, setTowCarEditModalVisible] = useState(false);
   const [isTowCarAddModalVisible, setTowCarAddModalVisible] = useState(false);
   const [towcarEdit, settowcarEdit] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchTowCars = async () => {
     try {
-      const response = await getGuinchosByGuincheiro(driver.id, driver.token);
+      setLoading(true);
+      const response = await getGuinchosByGuincheiro(driver.id);
       console.log("Tipo:", typeof response);
       console.log("É array?", Array.isArray(response));
       console.log("Valor:", response);
@@ -41,6 +43,8 @@ export default function TowCarSelection() {
     } catch (error) {
       console.error("Erro ao buscar veículos:", error);
       settowCars([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,6 +85,17 @@ const handleEditTowCar = (vehicle) => {
   setTowCarEditModalVisible(true);
 };
 
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor="#FFFFFF" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#1F284E" />
+          <Text style={styles.loadingText}>Carregando guinchos...</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

@@ -52,8 +52,21 @@ const styles = StyleSheet.create({
         opacity: 0.3,
         width: '75%',
         alignSelf: 'center',
+    },
+
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+    },
+
+    loadingText: {
+        marginTop: 16,
+        fontSize: 16,
+        color: '#1F284E',
+        fontFamily: 'Poppins-Regular',
     }
-    
 });
 
 

@@ -449,12 +449,6 @@ export default function CallProgress({ route, navigation }) {
                     // Se NÃO chegou, mostra botões de comunicação
                     <View style={styles.communicationContainer}>
                         <TouchableOpacity
-                            style={[styles.communicationButton, styles.phoneButton]}
-                            onPress={handleCall}
-                        >
-                            <Ionicons name="call" size={24} color="#4a4a4a" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
                             style={[styles.communicationButton, styles.chatButton]}
                             onPress={handleChat}
                         >

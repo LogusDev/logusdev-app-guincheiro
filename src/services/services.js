@@ -47,11 +47,9 @@ export const registerGuincheiro = async (guincheiroData) => {
 };
 
 // Buscar todos os guinchos do guincheiro logado
-export const getGuinchosByGuincheiro = async (guincheiroId, token) => {
+export const getGuinchosByGuincheiro = async (guincheiroId) => {
     try {
-        const response = await api.get(`/guinchos/guincheiro/${guincheiroId}`, {
-            headers: { 'x-access-token': token }
-        });
+        const response = await api.get(`/guinchos/guincheiro/${guincheiroId}`);
         return response.data;
     } catch (error) {
         throw error.response ? error.response.data : 'Erro ao carregar guinchos';
