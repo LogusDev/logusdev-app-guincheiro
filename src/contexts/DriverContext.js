@@ -17,8 +17,12 @@ export const DriverProvider = ({children}) => {
         }
     };
 
+    const logout = () => {
+        setDriver(null);
+    };
+
     return(
-        <DriverContext.Provider value={{driver, setDriver, login}}>
+        <DriverContext.Provider value={{driver, setDriver, login, logout}}>
             {children}
         </DriverContext.Provider>
     )
