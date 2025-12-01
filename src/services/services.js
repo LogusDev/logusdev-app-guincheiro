@@ -1,11 +1,9 @@
 import api from './api';
 
 // Criar guincho
-export const createGuincho = async (guinchoData, token) => {
+export const createGuincho = async (guinchoData) => {
     try {
-        const response = await api.post('/guinchos', guinchoData, {
-            headers: { 'x-access-token': token }
-        });
+        const response = await api.post('/guinchos', guinchoData);
         return response.data;
     } catch (error) {
         throw error.response ? error.response.data : 'Erro ao conectar com o servidor';
@@ -71,11 +69,9 @@ export const getGuinchoById = async (id) => {
 };
 
 // Atualizar guincho
-export const updateGuincho = async (id, data, token) => {
+export const updateGuincho = async (id, data) => {
     try {
-        const response = await api.put(`/guinchos/${id}`, data, {
-            headers: { 'x-access-token': token }
-        });
+        const response = await api.put(`/guinchos/${id}`, data);
         return response.data;
     } catch (error) {
         throw error.response ? error.response.data : 'Erro ao atualizar guincho';
@@ -83,10 +79,10 @@ export const updateGuincho = async (id, data, token) => {
 };
 
 // Deletar guincho
-export const deleteGuincho = async (id, token) => {
+export const deleteGuincho = async (id, guincheiro_id) => {
     try {
         const response = await api.delete(`/guinchos/${id}`, {
-            headers: { 'x-access-token': token }
+            data: { guincheiro_id }
         });
         return response.data;
     } catch (error) {
@@ -109,10 +105,10 @@ export const criarValoresGuincho = async (valoresData) => {
     }
 };
 
-export const selecionarGuincho = async (guinchoId, token) => {
+export const selecionarGuincho = async (guinchoId, guincheiroId) => {
     try {
-        const response = await api.put(`/guinchos/${guinchoId}/selecionar`, {}, {
-            headers: { 'x-access-token': token }
+        const response = await api.put(`/guinchos/${guinchoId}/selecionar`, {
+            guincheiro_id: guincheiroId
         });
         return response.data;
     } catch (error) {

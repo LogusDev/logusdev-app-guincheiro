@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, ScrollView } from "react-native";
+import { View, Text, StatusBar, ScrollView, Alert } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import TowCarCard from "../../components/TowCarCard";
 import styles from "./styles";
@@ -64,8 +64,7 @@ export default function TowCarSelection() {
   try {
     await api.put(
       `/guinchos/${vehicleId}/selecionar`,
-      {}, 
-      { headers: { 'x-access-token': driver.token } }
+      { guincheiro_id: driver.id }
     );
 
     setselectedTowCar(vehicleId);
@@ -124,9 +123,10 @@ const handleEditTowCar = (vehicle) => {
             const formattedVehicle = {
               ...updatedVehicle,
               placa: updatedVehicle.placa.replace(/[^a-zA-Z0-9]/g, "").toUpperCase(),
+              guincheiro_id: driver.id,
             };
 
-            const updated = await updateGuincho(formattedVehicle.id, formattedVehicle, driver.token);
+            const updated = await updateGuincho(formattedVehicle.id, formattedVehicle);
             await fetchTowCars();
 
             settowCars((prevtowCars) =>

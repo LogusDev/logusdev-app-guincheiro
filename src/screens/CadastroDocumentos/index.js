@@ -167,8 +167,11 @@ export default function CadastroDocumentos({ route, navigation }) {
       console.log('📅 Ano processado:', ano);
 
       // Cadastro do guincho
+      // Remove hífen da placa para enviar apenas 7 caracteres (formato do banco)
+      const placaLimpa = placa.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      
       const guinchoPayload = {
-        placa: placa,
+        placa: placaLimpa,
         marca: marcaSelecionada,
         modelo: modeloSelecionado,
         ano_fabricacao: parseInt(ano),
@@ -236,7 +239,7 @@ export default function CadastroDocumentos({ route, navigation }) {
         <Logo />
         <Image source={require('../../assets/images/register.png')} />
         
-        <Text style={styles.texto}>Verificação de documentos</Text>
+        <Text style={styles.texto}>Cadastro da foto de perfil</Text>
         <Text style={styles.texto2}>
           Envie a imagem solicitada abaixo para validar sua conta GuinchAqui.
         </Text>

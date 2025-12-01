@@ -31,7 +31,8 @@ export default function CadastroGuincho({ navigation, route }) {
 
   const [capacidade, setCapacidade] = useState("");
   const [comprimentoPlataforma, setComprimentoPlataforma] = useState("");
-  const [capacidadeValue, setCapacidadeValue] = useState(""); 
+  const [capacidadeValue, setCapacidadeValue] = useState("");
+  const [placa, setPlaca] = useState(""); 
 
   const { email, password, name, cpf: unmaskedCpf, phone: unmaskedPhone, cnh_num } = route.params;
 
@@ -60,6 +61,7 @@ export default function CadastroGuincho({ navigation, route }) {
       setAnoSelecionado(null);
       setCapacidade("");
       setComprimentoPlataforma("");
+      setPlaca("");
     }
   }, [marcaSelecionada]);
 
@@ -74,6 +76,7 @@ export default function CadastroGuincho({ navigation, route }) {
       setAnoSelecionado(null);
       setCapacidade("");
       setComprimentoPlataforma("");
+      setPlaca("");
     }
   }, [modeloSelecionado]);
 
@@ -98,6 +101,19 @@ export default function CadastroGuincho({ navigation, route }) {
         type: 'error',
         text1: 'Atenção',
         text2: 'Preencha todos os campos obrigatórios!',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
+    // Validar placa
+    const placaLimpa = placa.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    if (!placaLimpa || placaLimpa.length !== 7) {
+      Toast.show({
+        type: 'error',
+        text1: 'Atenção',
+        text2: 'Preencha a placa corretamente! (7 caracteres)',
         position: 'bottom',
         visibilityTime: 2000,
       });
@@ -143,7 +159,7 @@ export default function CadastroGuincho({ navigation, route }) {
       marcaSelecionada,
       capacidade: capacidadeLimpa,
       comprimentoPlataforma: comprimentoLimpo,
-      placa: ""
+      placa: placaLimpa
     });
   }
 
@@ -183,6 +199,24 @@ export default function CadastroGuincho({ navigation, route }) {
           value={anoSelecionado}
           name={"calendar-outline"}
           onValueChange={setAnoSelecionado}
+        />
+
+        <TextInputComponent
+          placeholder="Placa"
+          placeholderTextColor="#999999"
+          name="key-outline"
+          value={placa}
+          onChangeText={(text) => {
+            let formatted = text.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+            if (formatted.length > 3) {
+              formatted = formatted.slice(0, 3) + "-" + formatted.slice(3);
+            }
+            if (formatted.length > 8) {
+              formatted = formatted.slice(0, 8);
+            }
+            setPlaca(formatted);
+          }}
+          maxLength={8}
         />
 
         <TextInputComponent

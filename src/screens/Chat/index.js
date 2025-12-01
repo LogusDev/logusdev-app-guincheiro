@@ -5,9 +5,10 @@ import {
   TextInput,
   TouchableOpacity,
   Platform,
+  KeyboardAvoidingView,
+  ScrollView,
+  StatusBar,
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { io } from 'socket.io-client';
@@ -155,48 +156,49 @@ export default function Chat({ route, navigation }) {
         </View>
       </View>
 
-      {/* Messages e Input dentro do KeyboardAwareScrollView */}
-      <KeyboardAwareScrollView
-        style={styles.messagesContainer}
-        contentContainerStyle={styles.messagesContent}
-        innerRef={ref => {
-          scrollViewRef.current = ref;
-        }}
-        onContentSizeChange={scrollToBottom}
-        keyboardShouldPersistTaps="handled"
-        enableOnAndroid={true}
-        enableAutomaticScroll={true}
-        extraScrollHeight={Platform.OS === 'android' ? 90 : 90}
-        showsVerticalScrollIndicator={false}
+      {/* Messages e Input com KeyboardAvoidingView */}
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
-        {groupedMessages.map((item, index) => {
-          if (item.type === 'date') {
-            return (
-              <View key={`date-${index}`} style={styles.dateSeparator}>
-                <Text style={styles.dateText}>{item.date}</Text>
-              </View>
-            );
-          }
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.messagesContainer}
+          contentContainerStyle={styles.messagesContent}
+          onContentSizeChange={scrollToBottom}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {groupedMessages.map((item, index) => {
+            if (item.type === 'date') {
+              return (
+                <View key={`date-${index}`} style={styles.dateSeparator}>
+                  <Text style={styles.dateText}>{item.date}</Text>
+                </View>
+              );
+            }
 
-          const isMe = item.senderType === 'guincheiro';
-          return (
-            <View
-              key={`msg-${index}`}
-              style={[styles.messageWrapper, isMe ? styles.messageWrapperRight : styles.messageWrapperLeft]}
-            >
-              <View style={[styles.messageBubble, isMe ? styles.messageBubbleRight : styles.messageBubbleLeft]}>
-                <Text style={[styles.messageText, isMe ? styles.messageTextRight : styles.messageTextLeft]}>
-                  {item.message}
+            const isMe = item.senderType === 'guincheiro';
+            return (
+              <View
+                key={`msg-${index}`}
+                style={[styles.messageWrapper, isMe ? styles.messageWrapperRight : styles.messageWrapperLeft]}
+              >
+                <View style={[styles.messageBubble, isMe ? styles.messageBubbleRight : styles.messageBubbleLeft]}>
+                  <Text style={[styles.messageText, isMe ? styles.messageTextRight : styles.messageTextLeft]}>
+                    {item.message}
+                  </Text>
+                </View>
+                <Text style={[styles.messageTime, isMe ? styles.messageTimeRight : styles.messageTimeLeft]}>
+                  {formatTime(item.timestamp)}
                 </Text>
               </View>
-              <Text style={[styles.messageTime, isMe ? styles.messageTimeRight : styles.messageTimeLeft]}>
-                {formatTime(item.timestamp)}
-              </Text>
-            </View>
-          );
-        })}
+            );
+          })}
+        </ScrollView>
 
-        {/* Input dentro do scroll */}
+        {/* Input fixo na parte inferior */}
         <View style={styles.inputContainer}>
           <TouchableOpacity style={styles.emojiButton}>
             <Ionicons name="happy-outline" size={24} color="#1F284E" />
@@ -220,7 +222,7 @@ export default function Chat({ route, navigation }) {
             <Ionicons name="send" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
-      </KeyboardAwareScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }

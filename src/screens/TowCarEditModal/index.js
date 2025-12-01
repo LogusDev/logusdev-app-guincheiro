@@ -55,7 +55,7 @@ export default function TowCarEditModal({ visible, onClose, guincho, onSave }) {
     };
 
     try {
-      const updated = await updateGuincho(guincho.id, data, driver.token);
+      const updated = await updateGuincho(guincho.id, data);
 
       if (onSave) {
         onSave({
