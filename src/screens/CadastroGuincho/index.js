@@ -16,6 +16,7 @@ import styles from "../CadastroGuincho/styles";
 import PickerSelect from "../../components/PickerSelect";
 import axios from "axios";
 import Logo from "../../components/Logo";
+import api from '../../services/api';
 
 export default function CadastroGuincho({ navigation, route }) {
   const [guinchos, setGuinchos] = useState([]);
@@ -34,8 +35,10 @@ export default function CadastroGuincho({ navigation, route }) {
 
   const { email, password, name, cpf: unmaskedCpf, phone: unmaskedPhone, cnh_num } = route.params;
 
+  console.log(api)
+
   useEffect(() => {
-    axios.get("http://192.168.15.8:3333/guinchos")
+    api.get('/guinchos')
       .then(res => {
         setGuinchos(res.data);
 

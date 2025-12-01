@@ -12,6 +12,42 @@ export const createGuincho = async (guinchoData, token) => {
     }
 };
 
+
+
+
+
+export const registerGuincheiro = async (guincheiroData) => {
+
+
+    try {
+
+
+        console.log('[SERVICE] registerGuincheiro - Enviando dados:', guincheiroData);
+
+
+        const response = await api.post('/guincheiros', guincheiroData);
+
+
+        console.log('[SERVICE] registerGuincheiro - Resposta:', response.data);
+
+
+        return response.data;
+
+
+    } catch (error) {
+
+
+        console.error('[SERVICE] registerGuincheiro - Erro:', error.response?.data || error.message);
+
+
+        throw error.response ? error.response.data : 'Erro ao conectar com o servidor';
+
+
+    }
+
+
+};
+
 // Buscar todos os guinchos do guincheiro logado
 export const getGuinchosByGuincheiro = async (guincheiroId, token) => {
     try {
