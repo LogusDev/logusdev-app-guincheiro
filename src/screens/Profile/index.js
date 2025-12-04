@@ -19,7 +19,7 @@ export default function Profile(){
              onPress={() => navigation.navigate('EditProfile')}
             />
             <Options name={"lock-closed-outline"} text={"Trocar senha"} />
-            <Options name={"people-outline"} text={"Parcerias"} />
+            <Options name={"people-outline"} text={"Orçamento"} onPress={() => navigation.navigate('Budget')} />
             <Options name={"help-circle-outline"} text={"Ajuda"} />
             <Options name={"information-circle-outline"} text={"Sobre nós"} />
             <Options name={"log-out-outline"} text={"Sair da conta"} color={'red'} />

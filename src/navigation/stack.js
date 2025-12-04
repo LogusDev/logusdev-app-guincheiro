@@ -18,6 +18,7 @@ import ReceiptScreen from "../screens/ReceiptScreen";
 import EditProfile from "../screens/EditProfile";
 import Chat from "../screens/Chat";
 import TowCarSelection from "../screens/TowCarSelection";
+import Budget from "../screens/Budget";
 
 
 const Stack = createNativeStackNavigator();
@@ -42,6 +43,7 @@ export default function Navigation() {
                 <Stack.Screen name="ReceiptScreen" component={ReceiptScreen} />
                 <Stack.Screen name="Chat" component={Chat} />
                 <Stack.Screen name="TowCarSelection" component={TowCarSelection} />
+                <Stack.Screen name="Budget" component={Budget} />
             </Stack.Navigator>
         </NavigationContainer>
         </DriverProvider>
