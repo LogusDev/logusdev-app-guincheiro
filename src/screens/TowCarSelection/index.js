@@ -10,7 +10,7 @@ import TowCarEditModal from "../TowCarEditModal";
 import TowCarAddModal from "../TowCarAddModal";
 
 export default function TowCarSelection() {
-  const { driver } = useContext(DriverContext);
+  const { driver, token } = useContext(DriverContext);
   const [towCars, settowCars] = useState([]);
   const [selectedTowCar, setselectedTowCar] = useState(null);
   const [isTowCarEditModalVisible, setTowCarEditModalVisible] = useState(false);
@@ -68,7 +68,12 @@ export default function TowCarSelection() {
   try {
     await api.put(
       `/guinchos/${vehicleId}/selecionar`,
-      { guincheiro_id: driver.id }
+      { guincheiro_id: driver.id },
+      {
+        headers: {
+        Authorization: `Bearer ${token}`,
+        },
+      }
     );
 
     setselectedTowCar(vehicleId);
