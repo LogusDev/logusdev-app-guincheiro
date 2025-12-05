@@ -56,18 +56,13 @@ export default function TowCarEditModal({ visible, onClose, guincho, onSave }) {
       setCapacidade(guincho.capacidade?.toString() || "");
       setComprimento(guincho.comprimento_plataforma?.toString() || "");
     }
-  }, [visible]); // Remover guincho para evitar loops
+  }, [visible, guincho]);
 
   // Buscar marcas e modelos da base
   useEffect(() => {
     if (visible) {
       api.get("/guinchos/modelos")
         .then((res) => {
-          if (!res.data || !Array.isArray(res.data)) {
-            console.warn("Resposta inválida da API");
-            return;
-          }
-          
           setListaCompleta(res.data);
           
           // Apenas marcas
@@ -85,15 +80,13 @@ export default function TowCarEditModal({ visible, onClose, guincho, onSave }) {
         })
         .catch(err => console.log("Erro ao carregar modelos:", err));
     }
-  }, [visible]); // Remover guincho para evitar loops
+  }, [visible, guincho]);
 
   // Buscar modelos quando marca muda
   useEffect(() => {
-    if (!marcaSelecionada || !listaCompleta.length) {
+    if (!marcaSelecionada) {
       setModelos([]);
-      if (!marcaSelecionada) {
-        setModeloSelecionado(null);
-      }
+      setModeloSelecionado(null);
       return;
     }
 
@@ -104,56 +97,30 @@ export default function TowCarEditModal({ visible, onClose, guincho, onSave }) {
     setModelos(filtrados);
 
     // Encontra e seta o modelo do guincho após carregar os modelos
-    // Só faz isso uma vez quando o modal abre (verifica se modelo ainda não foi setado)
-    if (guincho?.modelo && filtrados.length > 0 && !modeloSelecionado) {
+    if (guincho?.modelo && filtrados.length > 0) {
       const modeloObj = filtrados.find(m => m.value === guincho.modelo);
       if (modeloObj) {
         setModeloSelecionado(modeloObj.value);
       }
     }
-  }, [marcaSelecionada, listaCompleta]); // Remover guincho para evitar loops
+  }, [marcaSelecionada, guincho, listaCompleta]);
 
   // Auto-preenchimento quando modelo muda (apenas se o usuário mudar manualmente)
   useEffect(() => {
     // Só auto-preenche se não estiver carregando dados iniciais do guincho
     // Verifica se o modelo selecionado é diferente do modelo do guincho original
-    if (modeloSelecionado && listaCompleta.length > 0 && marcaSelecionada) {
-      // Só atualiza se o modelo foi mudado pelo usuário (diferente do original)
-      if (!guincho || guincho.modelo !== modeloSelecionado) {
-        const info = listaCompleta.find(e => e.marca === marcaSelecionada && e.modelo === modeloSelecionado);
-        
-        if (info) {
-          setAnoFabricacao(info.ano_fabricacao?.toString() || "");
-          setCapacidade(info.capacidade?.toString() || "");
-          setComprimento(info.comprimento_plataforma?.toString() || "");
-        }
+    if (modeloSelecionado && listaCompleta.length > 0 && guincho?.modelo !== modeloSelecionado) {
+      const info = listaCompleta.find(e => e.marca === marcaSelecionada && e.modelo === modeloSelecionado);
+      
+      if (info) {
+        setAnoFabricacao(info.ano_fabricacao?.toString() || "");
+        setCapacidade(info.capacidade?.toString() || "");
+        setComprimento(info.comprimento_plataforma?.toString() || "");
       }
     }
-  }, [modeloSelecionado, marcaSelecionada]); // Remover listaCompleta e guincho para evitar loops
+  }, [modeloSelecionado, marcaSelecionada, listaCompleta]);
 
   const handleSave = async () => {
-    if (!guincho?.id) {
-      Toast.show({
-        type: 'error',
-        text1: 'Erro',
-        text2: 'Dados do guincho não encontrados.',
-        position: 'bottom',
-        visibilityTime: 2000,
-      });
-      return;
-    }
-
-    if (!driver?.id) {
-      Toast.show({
-        type: 'error',
-        text1: 'Erro',
-        text2: 'Dados do guincheiro não encontrados.',
-        position: 'bottom',
-        visibilityTime: 2000,
-      });
-      return;
-    }
-
     if (!marcaSelecionada || !modeloSelecionado || !placa.trim() || !anoFabricacao || !capacidade || !comprimento) {
       Toast.show({
         type: 'error',

@@ -86,16 +86,16 @@ useEffect(() => {
 
 
   useEffect(() => {
-    if (modelo && listaCompleta.length > 0) {
+    if (modelo) {
       const info = listaCompleta.find(e => e.modelo === modelo);
 
       if (info) {
-        setAno(info.ano_fabricacao?.toString() || "");
-        setCapacidade(info.capacidade?.toString() || "");
-        setComprimento(info.comprimento_plataforma?.toString() || "");
+        setAno(info.ano_fabricacao.toString());
+        setCapacidade(info.capacidade.toString());
+        setComprimento(info.comprimento_plataforma.toString());
       }
     }
-  }, [modelo, listaCompleta]);
+  }, [modelo]);
 
   const handlePlaca = (t) => {
     let tx = t.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
@@ -105,32 +105,23 @@ useEffect(() => {
   };
 
   const handleSave = async () => {
-    if (!driver?.id) {
-      Alert.alert("Erro", "Dados do guincheiro não encontrados.");
-      return;
-    }
-
     if (!marca || !modelo || !placa.trim()) {
       Alert.alert("Atenção", "Preencha todos os campos.");
       return;
     }
 
-    // Remove hífen da placa para enviar apenas 7 caracteres
-    const placaLimpa = placa.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-
     const payload = {
-      placa: placaLimpa,
+      placa,
       marca,
       modelo,
-      ano_fabricacao: parseInt(ano) || 0,
-      capacidade: parseFloat(capacidade) || 0,
-      comprimento_plataforma: parseFloat(comprimento) || 0,
-      guincheiro_id: driver.id,
+      ano_fabricacao: ano,
+      capacidade,
+      comprimento_plataforma: comprimento
     };
 
     try {
-      const novoGuincho = await createGuincho(payload);
-      if (onSave) onSave(novoGuincho);
+      const novoGuincho = await createGuincho(payload, driver.token);
+      onSave(novoGuincho);
       onClose();
     } catch (err) {
       Alert.alert("Erro", "Não foi possível adicionar o guincho.");
