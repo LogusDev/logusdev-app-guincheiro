@@ -9,10 +9,10 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
 import Button from "../../components/Button";
 import PickerSelect from "../../components/PickerSelect";
-import Icon from "react-native-vector-icons/Ionicons";
+import { Ionicons } from "@expo/vector-icons";
 import styles from "./style";
 import api from "../../services/api";
 import { DriverContext } from "../../contexts/DriverContext";
@@ -42,8 +42,10 @@ export default function TowCarEditModal({ visible, onClose, guincho, onSave }) {
       setCapacidade("");
       setComprimento("");
       setModelos([]);
-    } else if (visible && guincho) {
-      // Formata a placa se necessário
+      return;
+    }
+
+    if (visible && guincho) {
       let placaFormatada = guincho.placa || "";
       if (placaFormatada && !placaFormatada.includes("-")) {
         placaFormatada = placaFormatada.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
@@ -51,6 +53,7 @@ export default function TowCarEditModal({ visible, onClose, guincho, onSave }) {
           placaFormatada = placaFormatada.slice(0, 3) + "-" + placaFormatada.slice(3);
         }
       }
+
       setPlaca(placaFormatada);
       setAnoFabricacao(guincho.ano_fabricacao?.toString() || "");
       setCapacidade(guincho.capacidade?.toString() || "");
@@ -58,31 +61,26 @@ export default function TowCarEditModal({ visible, onClose, guincho, onSave }) {
     }
   }, [visible, guincho]);
 
-  // Buscar marcas e modelos da base
+  // Buscar marcas e modelos
   useEffect(() => {
     if (visible) {
-      api.get("/guinchos/modelos")
+      api
+        .get("/guinchos/modelos")
         .then((res) => {
           setListaCompleta(res.data);
-          
-          // Apenas marcas
-          const marcasList = [...new Set(res.data.map(e => e.marca))]
-            .map(m => ({ label: m, value: m }));
+
+          const marcasList = [...new Set(res.data.map((e) => e.marca))].map((m) => ({ label: m, value: m }));
           setMarcas(marcasList);
-          
-          // Encontra e seta a marca do guincho após carregar as marcas
-          if (guincho?.marca && marcasList.length > 0) {
-            const marcaObj = marcasList.find(m => m.value === guincho.marca);
-            if (marcaObj) {
-              setMarcaSelecionada(marcaObj.value);
-            }
+
+          if (guincho?.marca) {
+            setMarcaSelecionada(guincho.marca);
           }
         })
-        .catch(err => console.log("Erro ao carregar modelos:", err));
+        .catch((err) => console.log("Erro ao carregar modelos:", err));
     }
-  }, [visible, guincho]);
+  }, [visible]);
 
-  // Buscar modelos quando marca muda
+  // Carrega modelos quando a marca muda
   useEffect(() => {
     if (!marcaSelecionada) {
       setModelos([]);
@@ -91,49 +89,44 @@ export default function TowCarEditModal({ visible, onClose, guincho, onSave }) {
     }
 
     const filtrados = listaCompleta
-      .filter(e => e.marca === marcaSelecionada)
-      .map(e => ({ label: e.modelo, value: e.modelo }));
+      .filter((e) => e.marca === marcaSelecionada)
+      .map((e) => ({ label: e.modelo, value: e.modelo }));
 
     setModelos(filtrados);
 
-    // Encontra e seta o modelo do guincho após carregar os modelos
-    if (guincho?.modelo && filtrados.length > 0) {
-      const modeloObj = filtrados.find(m => m.value === guincho.modelo);
-      if (modeloObj) {
-        setModeloSelecionado(modeloObj.value);
-      }
+    if (guincho?.modelo) {
+      setModeloSelecionado(guincho.modelo);
     }
-  }, [marcaSelecionada, guincho, listaCompleta]);
+  }, [marcaSelecionada, listaCompleta]);
 
-  // Auto-preenchimento quando modelo muda (apenas se o usuário mudar manualmente)
+  // Auto-preencher campos
   useEffect(() => {
-    // Só auto-preenche se não estiver carregando dados iniciais do guincho
-    // Verifica se o modelo selecionado é diferente do modelo do guincho original
     if (modeloSelecionado && listaCompleta.length > 0 && guincho?.modelo !== modeloSelecionado) {
-      const info = listaCompleta.find(e => e.marca === marcaSelecionada && e.modelo === modeloSelecionado);
-      
+      const info = listaCompleta.find(
+        (e) => e.marca === marcaSelecionada && e.modelo === modeloSelecionado
+      );
+
       if (info) {
         setAnoFabricacao(info.ano_fabricacao?.toString() || "");
         setCapacidade(info.capacidade?.toString() || "");
         setComprimento(info.comprimento_plataforma?.toString() || "");
       }
     }
-  }, [modeloSelecionado, marcaSelecionada, listaCompleta]);
+  }, [modeloSelecionado]);
 
   const handleSave = async () => {
-    if (!marcaSelecionada || !modeloSelecionado || !placa.trim() || !anoFabricacao || !capacidade || !comprimento) {
+    if (!marcaSelecionada || !modeloSelecionado || !placa.trim()) {
       Toast.show({
-        type: 'error',
-        text1: 'Atenção',
-        text2: 'Preencha todos os campos.',
-        position: 'bottom',
+        type: "error",
+        text1: "Atenção",
+        text2: "Preencha todos os campos.",
+        position: "top",
         visibilityTime: 2000,
-      });
+      });  
       return;
     }
 
-    // Remove hífen da placa para enviar apenas 7 caracteres
-    const placaLimpa = placa.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const placaLimpa = placa.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
 
     const data = {
       placa: placaLimpa,
@@ -146,32 +139,24 @@ export default function TowCarEditModal({ visible, onClose, guincho, onSave }) {
     };
 
     try {
-      const updated = await updateGuincho(guincho.id, data);
+      await updateGuincho(guincho.id, data);
 
-      if (onSave) {
-        onSave({
-          ...guincho,
-          ...data,
-        });
-      }
+      if (onSave) onSave({ ...guincho, ...data });
 
       Toast.show({
-        type: 'success',
-        text1: 'Sucesso',
-        text2: 'Guincho atualizado com sucesso!',
-        position: 'bottom',
+        type: "success",
+        text1: "Sucesso",
+        text2: "Guincho atualizado com sucesso!",
+        position: "top",
         visibilityTime: 2000,
       });
 
       onClose();
     } catch (err) {
-      console.log("Erro ao atualizar guincho:", err);
       Toast.show({
-        type: 'error',
-        text1: 'Erro',
-        text2: 'Não foi possível atualizar o guincho.',
-        position: 'bottom',
-        visibilityTime: 2000,
+        type: "error",
+        text1: "Erro",
+        text2: "Falha ao atualizar.",
       });
     }
   };
@@ -179,18 +164,18 @@ export default function TowCarEditModal({ visible, onClose, guincho, onSave }) {
   return (
     <Modal visible={visible} animationType="fade" transparent>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.overlay}
       >
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ScrollView
+          keyboardShouldPersistTaps="always"
+          contentContainerStyle={styles.scrollContainer}
+        >
           <View style={styles.container}>
-            <TouchableOpacity 
-              style={styles.closeButton}
-              onPress={onClose}
-            >
-              <Icon name="close" size={28} color="#666" />
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+              <Ionicons name="close" size={28} color="#666" pointerEvents="none" />
             </TouchableOpacity>
-            
+
             <Text style={styles.title}>Editar Guincho</Text>
 
             {/* Marca */}
@@ -219,40 +204,58 @@ export default function TowCarEditModal({ visible, onClose, guincho, onSave }) {
               />
             </View>
 
-            {/* Ano de Fabricação (automático) */}
+            {/* Ano */}
             <View style={styles.inputWithIcon}>
               <TextInput
                 style={styles.textInputWithIcon}
                 placeholder="Ano de Fabricação"
                 placeholderTextColor="#888"
                 value={anoFabricacao}
-                editable={false}
+                onChangeText={setAnoFabricacao}
               />
-              <Icon name="calendar-outline" size={24} color="#b9b9b9ff" style={styles.iconStyleRight} />
+              <Ionicons
+                name="calendar-outline"
+                size={24}
+                color="#b9b9b9ff"
+                style={styles.iconStyleRight}
+                pointerEvents="none"
+              />
             </View>
 
-            {/* Capacidade (automático) */}
+            {/* Capacidade */}
             <View style={styles.inputWithIcon}>
               <TextInput
                 style={styles.textInputWithIcon}
                 placeholder="Capacidade (kg)"
                 placeholderTextColor="#888"
                 value={capacidade}
-                editable={false}
+                onChangeText={setCapacidade}
               />
-              <Icon name="scale-outline" size={24} color="#b9b9b9ff" style={styles.iconStyleRight} />
+              <Ionicons
+                name="scale-outline"
+                size={24}
+                color="#b9b9b9ff"
+                style={styles.iconStyleRight}
+                pointerEvents="none"
+              />
             </View>
 
-            {/* Comprimento da Plataforma (automático) */}
+            {/* Comprimento */}
             <View style={styles.inputWithIcon}>
               <TextInput
                 style={styles.textInputWithIcon}
                 placeholder="Comprimento da Plataforma (m)"
                 placeholderTextColor="#888"
                 value={comprimento}
-                editable={false}
+                onChangeText={setComprimento}
               />
-              <Icon name="resize-outline" size={24} color="#b9b9b9ff" style={styles.iconStyleRight} />
+              <Ionicons
+                name="resize-outline"
+                size={24}
+                color="#b9b9b9ff"
+                style={styles.iconStyleRight}
+                pointerEvents="none"
+              />
             </View>
 
             {/* Placa */}
@@ -264,23 +267,24 @@ export default function TowCarEditModal({ visible, onClose, guincho, onSave }) {
                 value={placa}
                 onChangeText={(text) => {
                   let formatted = text.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-                  if (formatted.length > 3) {
-                    formatted = formatted.slice(0, 3) + "-" + formatted.slice(3);
-                  }
-                  if (formatted.length > 8) {
-                    formatted = formatted.slice(0, 8);
-                  }
+                  if (formatted.length > 3) formatted = formatted.slice(0, 3) + "-" + formatted.slice(3);
+                  if (formatted.length > 8) formatted = formatted.slice(0, 8);
                   setPlaca(formatted);
                 }}
                 maxLength={8}
                 autoCapitalize="characters"
               />
-              <Icon name="key-outline" size={24} color="#b9b9b9ff" style={styles.iconStyleRight} />
+              <Ionicons
+                name="key-outline"
+                size={24}
+                color="#b9b9b9ff"
+                style={styles.iconStyleRight}
+                pointerEvents="none"
+              />
             </View>
 
-            {/* Botões */}
             <Button style={styles.button} text="Salvar" onPress={handleSave} />
-            
+
             <TouchableOpacity onPress={onClose}>
               <Text style={styles.cancelText}>Cancelar</Text>
             </TouchableOpacity>

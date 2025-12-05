@@ -25,7 +25,7 @@ export default function CadastroEmailSenha({ navigation }) {
         type: 'error',
         text1: 'Atenção',
         text2: 'Preencha todos os campos!',
-        position: 'bottom',
+        position: 'top',
         visibilityTime: 2000,
       });
       return;
@@ -35,7 +35,7 @@ export default function CadastroEmailSenha({ navigation }) {
         type: 'error',
         text1: 'Erro',
         text2: 'As senhas não coincidem!',
-        position: 'bottom',
+        position: 'top',
         visibilityTime: 2000,
       });
       return;
@@ -45,7 +45,7 @@ export default function CadastroEmailSenha({ navigation }) {
         type: 'error',
         text1: 'Erro',
         text2: 'E-mail inválido!',
-        position: 'bottom',
+        position: 'top',
         visibilityTime: 2000,
       });
       return;
@@ -55,7 +55,7 @@ export default function CadastroEmailSenha({ navigation }) {
         type: 'error',
         text1: 'Erro',
         text2: 'A senha deve ter pelo menos 6 caracteres',
-        position: 'bottom',
+        position: 'top',
         visibilityTime: 2000,
       });
       return;
@@ -74,7 +74,8 @@ export default function CadastroEmailSenha({ navigation }) {
         extraScrollHeight={20}
       >
         <Logo />
-        <Image source={require('../../assets/images/register.png')} />
+        <Image source={require('../../assets/images/register.png')}
+         />
         <Text style={styles.texto}>Criar minha conta</Text>
         <TextInputComponent placeholder="Email..." name="mail-outline" value={email} onChangeText={setEmail} />
         <TextInputComponent placeholder="Senha..." name="lock-closed-outline" secureTextEntry={true} value={password} onChangeText={setPassword} />

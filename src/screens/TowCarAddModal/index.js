@@ -116,7 +116,8 @@ useEffect(() => {
       modelo,
       ano_fabricacao: ano,
       capacidade,
-      comprimento_plataforma: comprimento
+      comprimento_plataforma: comprimento,
+      guincheiro_id: driver.id 
     };
 
     try {

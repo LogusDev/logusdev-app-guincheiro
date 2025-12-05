@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
 
   infoRight: {
     position: "absolute",
-    top: "47%",
+    top: "58%",
     right: 10,
     alignItems: "flex-end",
   },

@@ -1,6 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
 
-
 const { height, width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
@@ -42,33 +41,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
+
   pickerWrapper: {
-    width: "100%",
+    width: "110%",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 6,
   },
 
-  divInputHalf: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "95%",
-    gap: 6,
-    marginTop: 6,
-    alignSelf: "center",
-    minHeight: 50,
-  },
-
-  inputHalf: {
-    flex: 1,
-    borderWidth: 0,
-    borderRadius: 10,
-    backgroundColor: "#FFF",
-    height: 45,
-    justifyContent: "center",
-    paddingHorizontal: 8,
-  },
 
   inputWithIcon: {
     flexDirection: "row",
@@ -78,9 +57,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     height: 50,
-    position: "relative",
     backgroundColor: "#FFF",
-    marginBottom: 6,
+    marginBottom: 10,
+    width: "100%",
   },
 
   textInputWithIcon: {
@@ -98,6 +77,17 @@ const styles = StyleSheet.create({
     marginTop: -12,
   },
 
+  inputHalf: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    backgroundColor: "#FFF",
+    height: 50,
+    paddingHorizontal: 10,
+    justifyContent: "center",
+  },
+
   cancelText: {
     marginTop: 12,
     fontSize: 15,
@@ -107,7 +97,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    width: "95%",
+    width: "100%",
     height: 45,
     backgroundColor: "#1F284E",
     borderRadius: 10,
@@ -119,7 +109,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 4,
-    alignSelf: "center",
   },
 
   buttonText: {
@@ -129,7 +118,7 @@ const styles = StyleSheet.create({
   },
 
   closeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 15,
     right: 15,
     zIndex: 10,
@@ -141,11 +130,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 10,
-    color: '#333',
-    backgroundColor: '#FFF',
-    width: '100%',
+    color: "#333",
+    backgroundColor: "#FFF",
+    width: "100%",
   },
 });
 
