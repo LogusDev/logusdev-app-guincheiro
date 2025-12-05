@@ -37,18 +37,19 @@
     },
     "extra": {
       "eas": {
-        "projectId": "5f0e562d-6f01-4f14-8b2c-2f4a0db8c24b"
+        "projectId": "ad93ab1a-95f9-4e15-913e-329669e47f9b"
       }
     },
-    "plugins": [
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "Permita a localização"
-        }
-      ],
-      "expo-font",
-      "expo-video"
-    ]
-  }
+    "owner": "muriloweishaupt"
+  },
+  "plugins": [
+    [
+      "expo-location",
+      {
+        "locationAlwaysAndWhenInUsePermission": "Permita a localização"
+      }
+    ],
+    "expo-font",
+    "expo-video"
+  ]
 }

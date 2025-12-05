@@ -27,7 +27,7 @@ export default function Profile() {
             <ProfileCard onPress={() => navigation.navigate('EditProfile')} />
 
             <Options name={"lock-closed-outline"} text={"Trocar senha"} onPress={() => navigation.navigate("ChangePassword")} />
-            <Options name={"people-outline"} text={"Parcerias"} />
+            <Options name={"people-outline"} text={"Orçamento"} onPress={() => navigation.navigate("Budget")} />
             <Options name={"help-circle-outline"} text={"Ajuda"} onPress={() => navigation.navigate("Help")} />
             <Options name={"information-circle-outline"} text={"Sobre nós"} onPress={() => navigation.navigate("About")} />
             <Options name={"log-out-outline"} text={"Sair da conta"} color={'red'} onPress={() => setLogoutModalVisible(true)} />

@@ -11,31 +11,25 @@ export const DriverProvider = ({ children }) => {
     try {
       const response = await api.post('/guincheiros/login', credentials);
 
-    const logout = () => {
-        setDriver(null);
-    };
-
-    return(
-        <DriverContext.Provider value={{driver, setDriver, login, logout}}>
-            {children}
-        </DriverContext.Provider>
-    )
-}
       const guincheiroData = response.data.guincheiro;
       const authToken = response.data.token;
 
       setDriver(guincheiroData);
       setToken(authToken);
 
-      console.log('Login bem-sucedido:', { guincheiroData, authToken });
       return { guincheiroData, authToken };
     } catch (error) {
       throw error.response ? error.response.data : 'Erro ao conectar com o servidor';
     }
   };
 
+  const logout = () => {
+    setDriver(null);
+    setToken(null);
+  };
+
   return (
-    <DriverContext.Provider value={{ driver, setDriver, token, setToken, login }}>
+    <DriverContext.Provider value={{ driver, token, setDriver, setToken, login, logout }}>
       {children}
     </DriverContext.Provider>
   );
