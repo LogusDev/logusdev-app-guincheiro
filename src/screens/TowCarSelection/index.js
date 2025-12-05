@@ -20,6 +20,12 @@ export default function TowCarSelection() {
 
   const fetchTowCars = async () => {
     try {
+      if (!driver?.id) {
+        console.warn("Driver ID não disponível");
+        setLoading(false);
+        return;
+      }
+      
       setLoading(true);
       const response = await getGuinchosByGuincheiro(driver.id);
       console.log("Tipo:", typeof response);
@@ -52,7 +58,7 @@ export default function TowCarSelection() {
     if (driver?.id) {
       fetchTowCars();
     }
-  }, [driver]);
+  }, [driver?.id]); // Usar driver?.id para evitar re-renders desnecessários
 
   useEffect(() => {
   if (towCars.length > 0) {
@@ -65,20 +71,25 @@ export default function TowCarSelection() {
 
 
   const handleSelectedTowCar = async (vehicleId) => {
-  try {
-    await api.put(
-      `/guinchos/${vehicleId}/selecionar`,
-      { guincheiro_id: driver.id }
-    );
+    if (!driver?.id) {
+      Alert.alert("Erro", "Dados do guincheiro não disponíveis.");
+      return;
+    }
+    
+    try {
+      await api.put(
+        `/guinchos/${vehicleId}/selecionar`,
+        { guincheiro_id: driver.id }
+      );
 
-    setselectedTowCar(vehicleId);
-    fetchTowCars();
+      setselectedTowCar(vehicleId);
+      fetchTowCars();
 
-  } catch (error) {
-    console.log("Erro ao selecionar veículo", error);
-    Alert.alert("Erro", "Não foi possível selecionar o veículo.");
-  }
-};
+    } catch (error) {
+      console.log("Erro ao selecionar veículo", error);
+      Alert.alert("Erro", "Não foi possível selecionar o veículo.");
+    }
+  };
 
 const handleEditTowCar = (vehicle) => {
   settowcarEdit(vehicle);
@@ -135,9 +146,14 @@ const handleEditTowCar = (vehicle) => {
         guincho={towcarEdit}
         onSave={async (updatedVehicle) => {
           try {
+            if (!driver?.id || !updatedVehicle?.id) {
+              console.warn("Dados incompletos para atualização");
+              return;
+            }
+            
             const formattedVehicle = {
               ...updatedVehicle,
-              placa: updatedVehicle.placa.replace(/[^a-zA-Z0-9]/g, "").toUpperCase(),
+              placa: updatedVehicle.placa?.replace(/[^a-zA-Z0-9]/g, "")?.toUpperCase() || updatedVehicle.placa,
               guincheiro_id: driver.id,
             };
 

@@ -164,11 +164,7 @@ const styles = StyleSheet.create({
   },
   chatButton: {
     backgroundColor: '#F5F5F5',
-    borderBottomRightRadius: 25,
-    borderTopRightRadius: 25,
-    right: 20,
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
+    borderRadius: 25,
   },
   separatorLine: {
     height: 1,

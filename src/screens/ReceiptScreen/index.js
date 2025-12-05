@@ -7,6 +7,9 @@ import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import { captureRef } from "react-native-view-shot";
 import { Asset } from "expo-asset";
+import MapView, { Marker } from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
+import IconOrigem from "../../components/IconOrigem";
 
 export default function ReceiptScreen({ route }) {
   const { receiptData } = route.params || {};
@@ -19,7 +22,10 @@ export default function ReceiptScreen({ route }) {
   const [driverPlaceholderUri, setDriverPlaceholderUri] = useState(null);
 
   const offscreenRef = useRef();
+  const mapRef = useRef(null);
+  const offscreenMapRef = useRef(null);
   const { width, height } = Dimensions.get("screen");
+  const GOOGLE_API_KEY = 'AIzaSyBkx6mo29bFuoPzoNSLpE97c8EoWptHl1M';
 
   // Formata horários e datas
   const startTime = receiptData?.requisitado_em
@@ -156,8 +162,78 @@ export default function ReceiptScreen({ route }) {
         </View>
       </View>
 
-      {/* Mapa */}
-      {mapUri && <Image source={{ uri: mapUri }} style={styles.map} />}
+      {/* MapView com rota */}
+      {receiptData?.latitude_inicial && receiptData?.longitude_inicial && receiptData?.latitude_final && receiptData?.longitude_final ? (
+        <View style={styles.mapContainer}>
+          <MapView
+            ref={mapRef}
+            style={styles.map}
+            initialRegion={{
+              latitude: Number(receiptData.latitude_inicial),
+              longitude: Number(receiptData.longitude_inicial),
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            }}
+            scrollEnabled={false}
+            zoomEnabled={false}
+            pitchEnabled={false}
+            rotateEnabled={false}
+            onMapReady={() => {
+              if (mapRef.current && receiptData.latitude_inicial && receiptData.longitude_inicial && receiptData.latitude_final && receiptData.longitude_final) {
+                setTimeout(() => {
+                  mapRef.current?.fitToCoordinates(
+                    [
+                      { latitude: Number(receiptData.latitude_inicial), longitude: Number(receiptData.longitude_inicial) },
+                      { latitude: Number(receiptData.latitude_final), longitude: Number(receiptData.longitude_final) }
+                    ],
+                    {
+                      edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+                      animated: false
+                    }
+                  );
+                }, 500);
+              }
+            }}
+          >
+            <Marker
+              coordinate={{
+                latitude: Number(receiptData.latitude_inicial),
+                longitude: Number(receiptData.longitude_inicial)
+              }}
+              title="Origem"
+            >
+              <IconOrigem width={31} height={31} />
+            </Marker>
+            <Marker
+              coordinate={{
+                latitude: Number(receiptData.latitude_final),
+                longitude: Number(receiptData.longitude_final)
+              }}
+              title="Destino"
+            >
+              <Ionicons name="flag" size={30} color="#E53935" />
+            </Marker>
+            <MapViewDirections
+              origin={{
+                latitude: Number(receiptData.latitude_inicial),
+                longitude: Number(receiptData.longitude_inicial)
+              }}
+              destination={{
+                latitude: Number(receiptData.latitude_final),
+                longitude: Number(receiptData.longitude_final)
+              }}
+              apikey={GOOGLE_API_KEY}
+              strokeWidth={4}
+              strokeColor="#1F284E"
+              onError={(errorMessage) => {
+                console.warn('[ReceiptScreen] Erro API Directions:', errorMessage);
+              }}
+            />
+          </MapView>
+        </View>
+      ) : (
+        mapUri && <Image source={{ uri: mapUri }} style={styles.map} />
+      )}
 
       {/* Veículo */}
       <View style={styles.vehicleBox}>
@@ -228,8 +304,78 @@ export default function ReceiptScreen({ route }) {
           </View>
         </View>
 
-        {/* Mapa */}
-        {mapUri && <Image source={{ uri: mapUri }} style={styles.map} />}
+        {/* MapView offscreen para PDF */}
+        {receiptData?.latitude_inicial && receiptData?.longitude_inicial && receiptData?.latitude_final && receiptData?.longitude_final ? (
+          <View style={styles.mapContainer}>
+            <MapView
+              ref={offscreenMapRef}
+              style={styles.map}
+              initialRegion={{
+                latitude: Number(receiptData.latitude_inicial),
+                longitude: Number(receiptData.longitude_inicial),
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+              }}
+              scrollEnabled={false}
+              zoomEnabled={false}
+              pitchEnabled={false}
+              rotateEnabled={false}
+              onMapReady={() => {
+                if (offscreenMapRef.current && receiptData.latitude_inicial && receiptData.longitude_inicial && receiptData.latitude_final && receiptData.longitude_final) {
+                  setTimeout(() => {
+                    offscreenMapRef.current?.fitToCoordinates(
+                      [
+                        { latitude: Number(receiptData.latitude_inicial), longitude: Number(receiptData.longitude_inicial) },
+                        { latitude: Number(receiptData.latitude_final), longitude: Number(receiptData.longitude_final) }
+                      ],
+                      {
+                        edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+                        animated: false
+                      }
+                    );
+                  }, 500);
+                }
+              }}
+            >
+              <Marker
+                coordinate={{
+                  latitude: Number(receiptData.latitude_inicial),
+                  longitude: Number(receiptData.longitude_inicial)
+                }}
+                title="Origem"
+              >
+                <IconOrigem width={31} height={31} />
+              </Marker>
+              <Marker
+                coordinate={{
+                  latitude: Number(receiptData.latitude_final),
+                  longitude: Number(receiptData.longitude_final)
+                }}
+                title="Destino"
+              >
+                <Ionicons name="flag" size={30} color="#E53935" />
+              </Marker>
+              <MapViewDirections
+                origin={{
+                  latitude: Number(receiptData.latitude_inicial),
+                  longitude: Number(receiptData.longitude_inicial)
+                }}
+                destination={{
+                  latitude: Number(receiptData.latitude_final),
+                  longitude: Number(receiptData.longitude_final)
+                }}
+                apikey={GOOGLE_API_KEY}
+                strokeWidth={4}
+                strokeColor="#1F284E"
+                onError={(errorMessage) => {
+                  console.warn('[ReceiptScreen] Erro API Directions:', errorMessage);
+                }}
+              />
+            </MapView>
+          </View>
+        ) : (
+          mapUri && <Image source={{ uri: mapUri }} style={styles.map} />
+        )}
 
        {/* Veículo e pagamento */}
         <View style={[styles.vehicleBox, { paddingVertical: 10 }]}>
@@ -343,7 +489,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  map: {
+  mapContainer: {
     top: "-2%",
     width: "85%",
     height: 380,
@@ -352,6 +498,11 @@ const styles = StyleSheet.create({
     borderColor: "#000000ff",
     marginVertical: 15,
     alignSelf: "center",
+    overflow: "hidden",
+  },
+  map: {
+    width: "100%",
+    height: "100%",
   },
 
   vehicleBox: {

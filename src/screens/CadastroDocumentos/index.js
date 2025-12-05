@@ -15,6 +15,10 @@ export default function CadastroDocumentos({ route, navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFotoMotorista, setSelectedFotoMotorista] = useState(null);
 
+  // Verificar se route e route.params existem - retornar null para evitar crash
+  // Usar valores padrão para evitar erro de desestruturação
+  const params = route?.params || {};
+
   const {
     email,
     password,
@@ -30,7 +34,12 @@ export default function CadastroDocumentos({ route, navigation }) {
     placa,
     valorSaida,
     valorPorKm
-  } = route.params;
+  } = params;
+
+  // Se não houver parâmetros essenciais, retornar null
+  if (!email || !password || !name) {
+    return null;
+  }
 
   const successAlert = () => {
     Toast.show({
@@ -153,23 +162,49 @@ export default function CadastroDocumentos({ route, navigation }) {
       const guincheiroRes = await registerGuincheiro(guincheiroPayload);
       console.log('✅ Guincheiro cadastrado com sucesso:', guincheiroRes);
       
-      const guincheiroId = guincheiroRes.id;
+      // Verificar diferentes formatos de resposta
+      const guincheiroId = guincheiroRes?.id || guincheiroRes?.data?.id || guincheiroRes?.guincheiro?.id;
       console.log('🆔 ID do guincheiro:', guincheiroId);
+      console.log('📋 Resposta completa do servidor:', JSON.stringify(guincheiroRes, null, 2));
 
       if (!guincheiroId) {
-        throw new Error('ID do guincheiro não foi retornado');
+        console.error('❌ Erro: Resposta do servidor não contém ID:', JSON.stringify(guincheiroRes, null, 2));
+        throw new Error('ID do guincheiro não foi retornado pelo servidor');
       }
 
       // Tratar ano (caso venha com textinho a mais)
-      const ano = typeof anoSelecionado === 'string' 
-        ? anoSelecionado.slice(0, 4) 
-        : String(anoSelecionado).slice(0, 4);
+      const ano = anoSelecionado 
+        ? (typeof anoSelecionado === 'string' 
+            ? anoSelecionado.slice(0, 4) 
+            : String(anoSelecionado).slice(0, 4))
+        : null;
       console.log('📅 Ano processado:', ano);
+
+      if (!ano || isNaN(parseInt(ano))) {
+        throw new Error('Ano de fabricação inválido');
+      }
 
       // Cadastro do guincho
       // Remove hífen da placa para enviar apenas 7 caracteres (formato do banco)
-      const placaLimpa = placa.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      const placaLimpa = placa ? placa.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() : '';
       
+      if (!placaLimpa || placaLimpa.length !== 7) {
+        throw new Error('Placa inválida. Deve conter 7 caracteres');
+      }
+      
+      // Validações adicionais antes de criar o guincho
+      if (!marcaSelecionada || !modeloSelecionado) {
+        throw new Error('Marca e modelo são obrigatórios');
+      }
+
+      if (!capacidade || isNaN(parseFloat(capacidade)) || parseFloat(capacidade) <= 0) {
+        throw new Error('Capacidade inválida');
+      }
+
+      if (!comprimentoPlataforma || isNaN(parseFloat(comprimentoPlataforma)) || parseFloat(comprimentoPlataforma) <= 0) {
+        throw new Error('Comprimento da plataforma inválido');
+      }
+
       const guinchoPayload = {
         placa: placaLimpa,
         marca: marcaSelecionada,
@@ -183,6 +218,15 @@ export default function CadastroDocumentos({ route, navigation }) {
       console.log('🚗 Cadastrando guincho com payload:', guinchoPayload);
       const guinchoRes = await createGuincho(guinchoPayload);
       console.log('✅ Guincho cadastrado com sucesso:', guinchoRes);
+
+      // Validações antes de criar valores
+      if (!valorSaida || isNaN(parseFloat(valorSaida)) || parseFloat(valorSaida) <= 0) {
+        throw new Error('Valor da saída inválido');
+      }
+
+      if (!valorPorKm || isNaN(parseFloat(valorPorKm)) || parseFloat(valorPorKm) <= 0) {
+        throw new Error('Valor por Km inválido');
+      }
 
       // Cadastro dos valores do guincho na tabela ValoresGuincho
       const valoresPayload = {
@@ -199,9 +243,7 @@ export default function CadastroDocumentos({ route, navigation }) {
       successAlert();
 
       setTimeout(() => {
-        navigation.navigate('Login', {
-          fotoUrl: uploadFotoMotorista.data.fotoUrl
-        });
+        navigation.navigate('Login');
       }, 1500);
 
     } catch (error) {
@@ -258,7 +300,7 @@ export default function CadastroDocumentos({ route, navigation }) {
 
         <View style={{ width: '100%', alignItems: 'center', marginTop: 20, marginBottom: 30 }}>
           <Button 
-            text={isLoading ? <ActivityIndicator size="small" color="#ffffff" /> : "Continuar"} 
+            text={isLoading ? <ActivityIndicator size="small" color="#ffffff" /> : "Criar sua conta"} 
             onPress={handleSignIn} 
           />
         </View>

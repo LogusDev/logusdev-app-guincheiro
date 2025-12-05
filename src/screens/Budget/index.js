@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, StatusBar, Image } from "react-native";
+import { View, Text, StatusBar, Image, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Toast from "react-native-toast-message";
 import TextInputComponent from "../../components/TextInput";
@@ -7,6 +7,8 @@ import Button from "../../components/Button";
 import styles from "./styles";
 import { DriverContext } from "../../contexts/DriverContext";
 import { getValorAtual, updateValoresGuincho } from "../../services/towCarValues";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Budget() {
   const { driver, token } = useContext(DriverContext);
@@ -14,7 +16,7 @@ export default function Budget() {
   const [valorKm, setValorKm] = useState("");
   const [valorId, setValorId] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const navigation = useNavigation();
   const exibirValor = (valor) => (valor ? `R$ ${parseFloat(valor).toFixed(2)}` : "");
 
   const parseValor = (text) => {
@@ -87,6 +89,12 @@ export default function Budget() {
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
+              <TouchableOpacity
+          style={{position: 'absolute', top: 50, left: 20, zIndex: 10, padding: 8,}}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#E53935" />
+        </TouchableOpacity>
 
     <Image style={{ height: 270, width: 270 }} source={require("../../assets/images/register.png")} />
 
