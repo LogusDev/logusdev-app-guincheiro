@@ -2,7 +2,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MyTabs from "./bottomTabs";
 
 import { NavigationContainer } from "@react-navigation/native";
-
 import Login from "../screens/Login";
 import CadastroEmailSenha from "../screens/CadastroEmailSenha";
 import CadastroNomeCpfTelefone from "../screens/CadastroNomeCpfTelefone";
@@ -16,6 +15,9 @@ import CallProgress from "../screens/CallProgress";
 import ActivityScreen from "../screens/ActivityScreen";
 import ReceiptScreen from "../screens/ReceiptScreen";
 import EditProfile from "../screens/EditProfile";
+import Help from '../screens/Help';
+import About from '../screens/About';
+import ChangePassword from '../screens/ChangePassword';
 import Chat from "../screens/Chat";
 import TowCarSelection from "../screens/TowCarSelection";
 import Budget from "../screens/Budget";
@@ -39,6 +41,9 @@ export default function Navigation() {
                 <Stack.Screen name="EditProfile" component={EditProfile} />
                 <Stack.Screen name="DetalheChamado" component={DetalheChamado} />
                 <Stack.Screen name="CallProgress" component={CallProgress} />
+                <Stack.Screen name='Help' component={Help} />
+                <Stack.Screen name='About' component={About} />
+                <Stack.Screen name="ChangePassword" component={ChangePassword} />
                 <Stack.Screen name="ActivityScreen" component={ActivityScreen} />
                 <Stack.Screen name="ReceiptScreen" component={ReceiptScreen} />
                 <Stack.Screen name="Chat" component={Chat} />

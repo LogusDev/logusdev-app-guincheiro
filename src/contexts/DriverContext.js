@@ -11,6 +11,16 @@ export const DriverProvider = ({ children }) => {
     try {
       const response = await api.post('/guincheiros/login', credentials);
 
+    const logout = () => {
+        setDriver(null);
+    };
+
+    return(
+        <DriverContext.Provider value={{driver, setDriver, login, logout}}>
+            {children}
+        </DriverContext.Provider>
+    )
+}
       const guincheiroData = response.data.guincheiro;
       const authToken = response.data.token;
 
