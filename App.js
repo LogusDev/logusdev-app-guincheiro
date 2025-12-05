@@ -1,6 +1,14 @@
 import StackNavigator from './src/navigation/stack';
 import { useFonts } from 'expo-font';
 import Toast from 'react-native-toast-message';
+import { DriverProvider } from './src/contexts/DriverContext';
+import { LogBox } from 'react-native';
+import './src/services/firebase'; // Inicializa o Firebase
+
+// Ignora logs que começam com o texto específico
+LogBox.ignoreAllLogs();
+
+// ... resto do seu código (import React, App, etc.)
 
 
 export default function App(){
@@ -14,11 +22,15 @@ export default function App(){
   if(!fontsLoaded){
     return null;
   }
-  
-  return(
+
+  return (
     <>
-      <StackNavigator/>
+      <DriverProvider>
+        <StackNavigator/>
+      </DriverProvider>
       <Toast/>
     </>
-  )
+  );
 }
+
+//Arruar

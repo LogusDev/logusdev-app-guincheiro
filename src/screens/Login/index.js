@@ -105,7 +105,7 @@ export default function Login(){
             secureTextEntry={true}
             name={"lock-closed-outline"}
             />
-            <TouchableOpacity >
+            <TouchableOpacity onPress={() => {navigation.navigate("CadastroEmailSenha")}}>
                 <Text style={{color:"#616161", fontSize:14}}>
                     Não tem uma conta? <Text style={{color:"#1F284E", fontWeight:'bold', fontFamily:'Poppins-Regular'}}>Crie uma</Text>
                 </Text>

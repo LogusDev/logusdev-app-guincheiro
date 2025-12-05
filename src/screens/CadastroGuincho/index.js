@@ -1,0 +1,255 @@
+import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  StatusBar,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Ionicons } from '@expo/vector-icons';
+import Toast from 'react-native-toast-message';
+import TextInputComponent from "../../components/TextInput";
+import Button from "../../components/Button";
+import styles from "../CadastroGuincho/styles";
+import PickerSelect from "../../components/PickerSelect";
+import axios from "axios";
+import Logo from "../../components/Logo";
+import api from '../../services/api';
+
+export default function CadastroGuincho({ navigation, route }) {
+  const [guinchos, setGuinchos] = useState([]);
+
+  const [marcas, setMarcas] = useState([]);
+  const [modelos, setModelos] = useState([]);
+  const [anos, setAnos] = useState([]);
+
+  const [marcaSelecionada, setMarcaSelecionada] = useState(null);
+  const [modeloSelecionado, setModeloSelecionado] = useState(null);
+  const [anoSelecionado, setAnoSelecionado] = useState(null);
+
+  const [capacidade, setCapacidade] = useState("");
+  const [comprimentoPlataforma, setComprimentoPlataforma] = useState("");
+  const [capacidadeValue, setCapacidadeValue] = useState("");
+  const [placa, setPlaca] = useState(""); 
+
+  const { email, password, name, cpf: unmaskedCpf, phone: unmaskedPhone, cnh_num } = route.params;
+
+  console.log(api)
+
+  useEffect(() => {
+    api.get('/guinchos')
+      .then(res => {
+        setGuinchos(res.data);
+
+        const marcasUnicas = [...new Set(res.data.map(g => g.marca))];
+        setMarcas(marcasUnicas.map(m => ({ label: m, value: m })));
+      })
+      .catch(err => console.log(err));
+  }, []);
+
+  useEffect(() => {
+    if (marcaSelecionada) {
+      const modelosFiltrados = guinchos
+        .filter(g => g.marca === marcaSelecionada)
+        .map(g => g.modelo);
+      const modelosUnicos = [...new Set(modelosFiltrados)];
+      setModelos(modelosUnicos.map(m => ({ label: m, value: m })));
+
+      setModeloSelecionado(null);
+      setAnoSelecionado(null);
+      setCapacidade("");
+      setComprimentoPlataforma("");
+      setPlaca("");
+    }
+  }, [marcaSelecionada]);
+
+  useEffect(() => {
+    if (modeloSelecionado) {
+      const anosFiltrados = guinchos
+        .filter(g => g.marca === marcaSelecionada && g.modelo === modeloSelecionado)
+        .map(g => g.ano_fabricacao);
+      const anosUnicos = [...new Set(anosFiltrados)];
+      setAnos(anosUnicos.map(a => ({ label: String(a), value: a })));
+
+      setAnoSelecionado(null);
+      setCapacidade("");
+      setComprimentoPlataforma("");
+      setPlaca("");
+    }
+  }, [modeloSelecionado]);
+
+  useEffect(() => {
+    if (anoSelecionado) {
+      const guinchoSelecionado = guinchos.find(
+        g => g.marca === marcaSelecionada &&
+             g.modelo === modeloSelecionado &&
+             g.ano_fabricacao === anoSelecionado
+      );
+
+      if (guinchoSelecionado) {
+        setCapacidadeValue(String(guinchoSelecionado.capacidade));
+        setComprimentoPlataforma(String(guinchoSelecionado.comprimento_plataforma));
+      }
+    }
+  }, [anoSelecionado]);
+
+  function handleSignIn() {
+    if (!marcaSelecionada || !modeloSelecionado || !anoSelecionado) {
+      Toast.show({
+        type: 'error',
+        text1: 'Atenção',
+        text2: 'Preencha todos os campos obrigatórios!',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
+    // Validar placa
+    const placaLimpa = placa.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    if (!placaLimpa || placaLimpa.length !== 7) {
+      Toast.show({
+        type: 'error',
+        text1: 'Atenção',
+        text2: 'Preencha a placa corretamente! (7 caracteres)',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
+    // Validar capacidade e comprimento da plataforma
+    if (!capacidadeValue || capacidadeValue.trim() === '') {
+      Toast.show({
+        type: 'error',
+        text1: 'Atenção',
+        text2: 'Preencha a capacidade do guincho!',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
+    if (!comprimentoPlataforma || comprimentoPlataforma.trim() === '') {
+      Toast.show({
+        type: 'error',
+        text1: 'Atenção',
+        text2: 'Preencha o comprimento da plataforma!',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
+    // Remover "kg" e "m" dos valores antes de passar
+    const capacidadeLimpa = capacidadeValue.replace(/[^0-9.]/g, '');
+    const comprimentoLimpo = comprimentoPlataforma.replace(/[^0-9.]/g, '').replace(/\s*m\s*/g, '');
+
+    navigation.navigate("CadastroPrecos", {
+      email,
+      password,
+      name,
+      cpf: unmaskedCpf,
+      phone: unmaskedPhone,
+      cnh_num,
+      anoSelecionado,
+      modeloSelecionado,
+      marcaSelecionada,
+      capacidade: capacidadeLimpa,
+      comprimentoPlataforma: comprimentoLimpo,
+      placa: placaLimpa
+    });
+  }
+
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle={'light-content'} />
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        enableOnAndroid={true}
+        extraScrollHeight={20}
+      >
+        <Logo />
+        <Image style={{ height: 270, width: 270 }} source={require("../../assets/images/register.png")} />
+        <Text style={styles.texto}>Dados do veículo</Text>
+
+        <PickerSelect
+          placeholder={{ label: "Selecione a marca...", value: null }}
+          items={marcas}
+          value={marcaSelecionada}
+          name={"car-sport-outline"}
+          onValueChange={setMarcaSelecionada}
+        />
+
+        <PickerSelect
+          placeholder={{ label: "Selecione o modelo...", value: null }}
+          items={modelos}
+          value={modeloSelecionado}
+          name={"car-outline"}
+          onValueChange={setModeloSelecionado}
+        />
+
+        <PickerSelect
+          placeholder={{ label: "Selecione o ano...", value: null }}
+          items={anos}
+          value={anoSelecionado}
+          name={"calendar-outline"}
+          onValueChange={setAnoSelecionado}
+        />
+
+        <TextInputComponent
+          placeholder="Placa"
+          placeholderTextColor="#999999"
+          name="key-outline"
+          value={placa}
+          onChangeText={(text) => {
+            let formatted = text.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+            if (formatted.length > 3) {
+              formatted = formatted.slice(0, 3) + "-" + formatted.slice(3);
+            }
+            if (formatted.length > 8) {
+              formatted = formatted.slice(0, 8);
+            }
+            setPlaca(formatted);
+          }}
+          maxLength={8}
+        />
+
+        <TextInputComponent
+            placeholder="Capacidade (Kg)"
+            placeholderTextColor="#999999"
+            name="scale-outline"
+            value={capacidadeValue ? `${capacidadeValue} kg` : ''}
+            onChangeText={(text) => {
+            const numeric = text.replace(/[^0-9.]/g,'');
+            setCapacidadeValue(numeric);
+        }}
+        />
+
+        <TextInputComponent
+            placeholder="Comprimento da plataforma (m)"
+            name="resize-outline"
+            value={comprimentoPlataforma}
+            onChangeText={(text) => {
+                let numeric = text.replace(/[^0-9.]/g, '');
+                if (numeric.includes('.')) {
+                const parts = numeric.split('.');
+                numeric = parts[0] + '.' + parts[1].slice(0, 2);
+                }
+
+                setComprimentoPlataforma(numeric ? `${numeric} m` : '');
+            }}
+            keyboardType="numeric"
+            placeholderTextColor="#999999"
+        />
+
+
+        <Button style={{marginTop: 12, marginBottom: 30}} text={"Próximo"} onPress={handleSignIn} />
+      </KeyboardAwareScrollView>
+    </View>
+  );
+}
